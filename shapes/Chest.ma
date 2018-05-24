@@ -1,6 +1,6 @@
 //Maya ASCII 2017 scene
 //Name: Chest.ma
-//Last modified: Wed, May 02, 2018 08:16:02 PM
+//Last modified: Thu, May 24, 2018 03:41:20 PM
 //Codeset: 1252
 requires maya "2017";
 requires "stereoCamera" "10.0";
@@ -9,18 +9,18 @@ currentUnit -l centimeter -a degree -t ntsc;
 fileInfo "application" "maya";
 fileInfo "product" "Maya 2017";
 fileInfo "version" "2017";
-fileInfo "cutIdentifier" "201606150345-997974";
+fileInfo "cutIdentifier" "201608291545-1001872";
 fileInfo "osv" "Microsoft Windows 8 Home Premium Edition, 64-bit  (Build 9200)\n";
-createNode transform -n "Chest";
-	rename -uid "1C625DAC-4858-75E7-3244-60BAD39DFB34";
+createNode transform -n "Chest1:Chest";
+	rename -uid "611386E8-456B-FD9D-D5C0-6AB59B17337F";
 	addAttr -ci true -sn "_class" -ln "_class" -dt "string";
 	addAttr -s false -ci true -m -sn "SHAPE" -ln "SHAPE" -at "message";
 	addAttr -ci true -sn "Network" -ln "Network" -dt "string";
 	setAttr ".s" -type "double3" 1.0000000000000002 1.0000000000000002 1 ;
 	setAttr "._class" -type "string" "_CtrlNode";
 	setAttr ".Network" -type "string" "Spine_Net";
-createNode nurbsCurve -n "PlaceholderShape" -p "|Chest";
-	rename -uid "82B95F27-47FA-3F0A-535C-A699CC3FA4D3";
+createNode nurbsCurve -n "Chest1:PlaceholderShape" -p "Chest1:Chest";
+	rename -uid "ADBF5560-4C78-7446-A016-FEB2DDDFD0A3";
 	setAttr -k off ".v";
 	setAttr ".cc" -type "nurbsCurve" 
 		1 15 0 no 3
@@ -31,17 +31,17 @@ createNode nurbsCurve -n "PlaceholderShape" -p "|Chest";
 		34.258393505692013 38.549923352768914 -28.142710630991779
 		34.258393505692013 38.549923352768914 28.142710630991779
 		-34.258393505692013 38.549923352768914 28.142710630991779
-		-18.145508654247273 -7 23.060227002855267
-		-18.145508654247273 -7 -23.060227002855267
+		-26.464843054691084 0.62620485942224491 23.060227002855267
+		-26.464843054691084 0.62620485942224491 -23.060227002855267
 		-34.258393505692013 38.549923352768914 -28.142710630991779
 		34.258393505692013 38.549923352768914 -28.142710630991779
-		18.145508654247273 -7 -23.060227002855267
-		-18.145508654247273 -7 -23.060227002855267
-		-18.145508654247273 -7 23.060227002855267
-		18.145508654247273 -7 23.060227002855267
+		26.464843054691084 0.62620485942224491 -23.060227002855267
+		-26.464843054691084 0.62620485942224491 -23.060227002855267
+		-26.464843054691084 0.62620485942224491 23.060227002855267
+		26.464843054691084 0.62620485942224491 23.060227002855267
 		34.258393505692013 38.549923352768914 28.142710630991779
-		18.145508654247273 -7 23.060227002855267
-		18.145508654247273 -7 -23.060227002855267
+		26.464843054691084 0.62620485942224491 23.060227002855267
+		26.464843054691084 0.62620485942224491 -23.060227002855267
 		;
 select -ne :time1;
 	setAttr -av -k on ".cch";
@@ -62,12 +62,13 @@ select -ne :hardwareRenderingGlobals;
 	setAttr -av ".aora";
 	setAttr -av ".mbe";
 	setAttr -k on ".mbsof";
+	setAttr ".msaa" yes;
 select -ne :renderPartition;
 	setAttr -av -k on ".cch";
 	setAttr -k on ".ihi";
 	setAttr -av -k on ".nds";
 	setAttr -cb on ".bnm";
-	setAttr -s 3 ".st";
+	setAttr -s 4 ".st";
 	setAttr -k on ".an";
 	setAttr -k on ".pt";
 select -ne :renderGlobalsList1;
@@ -88,10 +89,12 @@ select -ne :postProcessList1;
 	setAttr -cb on ".bnm";
 	setAttr -s 2 ".p";
 select -ne :defaultRenderUtilityList1;
-	setAttr -s 12 ".u";
+	setAttr -s 52 ".u";
 select -ne :defaultRenderingList1;
 	setAttr -k on ".ihi";
 	setAttr -s 2 ".r";
+select -ne :lambert1;
+	setAttr ".it" -type "float3" 0.7483871 0.7483871 0.7483871 ;
 select -ne :initialShadingGroup;
 	setAttr -av -k on ".cch";
 	setAttr -k on ".ihi";
@@ -274,5 +277,11 @@ select -ne :hardwareRenderGlobals;
 	setAttr -k on ".shml";
 	setAttr -k on ".hwel";
 select -ne :ikSystem;
+	setAttr -k on ".cch";
+	setAttr -k on ".ihi";
+	setAttr -k on ".nds";
+	setAttr -k on ".bnm";
+	setAttr -av -k on ".gsn";
+	setAttr -k on ".gsv";
 	setAttr -s 4 ".sol";
 // End of Chest.ma

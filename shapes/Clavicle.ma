@@ -1,6 +1,6 @@
 //Maya ASCII 2017 scene
 //Name: Clavicle.ma
-//Last modified: Fri, May 18, 2018 07:57:18 AM
+//Last modified: Thu, May 24, 2018 03:26:11 PM
 //Codeset: 1252
 requires maya "2017";
 requires "stereoCamera" "10.0";
@@ -11,22 +11,22 @@ fileInfo "product" "Maya 2017";
 fileInfo "version" "2017";
 fileInfo "cutIdentifier" "201608291545-1001872";
 fileInfo "osv" "Microsoft Windows 8 Home Premium Edition, 64-bit  (Build 9200)\n";
-createNode transform -n "Clavicle1:Clavicle1";
-	rename -uid "7763A054-4C0A-9E64-0211-94962D396614";
-createNode nurbsCurve -n "Clavicle1:ClavicleShape1" -p "Clavicle1:Clavicle1";
-	rename -uid "2B84DF28-495E-0C96-3804-04B619ECDA01";
+createNode transform -n "Clavicle:Clavicle1:Clavicle1";
+	rename -uid "BA64A77A-42A5-6DCC-68CB-258C9E42E869";
+createNode nurbsCurve -n "Clavicle:Clavicle1:ClavicleShape1" -p "Clavicle:Clavicle1:Clavicle1";
+	rename -uid "0C703D0B-4918-1F92-B330-DF8EFCED0405";
 	setAttr -k off ".v";
 	setAttr ".cc" -type "nurbsCurve" 
 		1 6 0 no 3
 		7 0 1 2 3 4 5 6
 		7
 		0 0 0
-		0 42.010397334189264 -9.3281820788136436e-015
-		-14.000000000000012 42.010397334189264 -9.3281820788136436e-015
-		-8.0000000000000071 46.010397334189264 -1.0216360498513769e-014
-		8.0000000000000071 46.010397334189264 -1.0216360498513769e-014
-		12.000000000000011 42.010397334189264 -9.3281820788136436e-015
-		0 42.010397334189264 -9.3281820788136436e-015
+		-19.470444247523314 19.470444247523332 -9.3281820788136436e-015
+		-23.398828181359857 15.542060313686791 -9.3281820788136436e-015
+		-24.040344946822962 20.55739779771606 -1.0216360498513769e-014
+		-20.557409582750303 24.040333161788716 -1.0216360498513769e-014
+		-15.542081526748266 23.398806968298381 -9.3281820788136436e-015
+		-19.470444247523314 19.470444247523332 -9.3281820788136436e-015
 		;
 select -ne :time1;
 	setAttr -av -k on ".cch";
@@ -47,12 +47,13 @@ select -ne :hardwareRenderingGlobals;
 	setAttr -av ".aora";
 	setAttr -av ".mbe";
 	setAttr -k on ".mbsof";
+	setAttr ".msaa" yes;
 select -ne :renderPartition;
 	setAttr -av -k on ".cch";
 	setAttr -k on ".ihi";
 	setAttr -av -k on ".nds";
 	setAttr -cb on ".bnm";
-	setAttr -s 3 ".st";
+	setAttr -s 4 ".st";
 	setAttr -k on ".an";
 	setAttr -k on ".pt";
 select -ne :renderGlobalsList1;
@@ -73,10 +74,12 @@ select -ne :postProcessList1;
 	setAttr -cb on ".bnm";
 	setAttr -s 2 ".p";
 select -ne :defaultRenderUtilityList1;
-	setAttr -s 12 ".u";
+	setAttr -s 52 ".u";
 select -ne :defaultRenderingList1;
 	setAttr -k on ".ihi";
 	setAttr -s 2 ".r";
+select -ne :lambert1;
+	setAttr ".it" -type "float3" 0.7483871 0.7483871 0.7483871 ;
 select -ne :initialShadingGroup;
 	setAttr -av -k on ".cch";
 	setAttr -k on ".ihi";
@@ -259,5 +262,11 @@ select -ne :hardwareRenderGlobals;
 	setAttr -k on ".shml";
 	setAttr -k on ".hwel";
 select -ne :ikSystem;
+	setAttr -k on ".cch";
+	setAttr -k on ".ihi";
+	setAttr -k on ".nds";
+	setAttr -k on ".bnm";
+	setAttr -av -k on ".gsn";
+	setAttr -k on ".gsv";
 	setAttr -s 4 ".sol";
 // End of Clavicle.ma
