@@ -38,12 +38,16 @@ Echo.%PYTHONPATH% | Find /I /C "%logPath%" && ( goto doNotSetPath ) || ( goto se
 :setPythonPath
     echo setting path
     echo %logPath%
-    setx PYTHONPATH %PYTHONPATH%;%logPath%
+    setx PYTHONPATH %PYTHONPATH%%logPath%
     if exist "install_log.txt" ( del "install_log.txt" )
+    pause
+    EXIT /B 0
 
 :doNotSetPath
     echo Project path already exists in PYTHONPATH, skipping.
     if exist "install_log.txt" ( del "install_log.txt" )
+    pause
+    EXIT /B 0
 
 echo Project is successfully installed.
 pause
