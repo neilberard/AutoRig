@@ -279,7 +279,7 @@ def build_spine(jnts, net=None):
     # Ik Spline Twist
     net.ik_handles[0].dTwistControlEnable.set(1)
     net.ik_handles[0].dWorldUpType.set(4)
-    net.ik_handles[0].dForwardAxis.set(1)
+    net.ik_handles[0].dForwardAxis.set(0)
 
     net.ik_ctrls[0].worldMatrix[0].connect(net.ik_handles[0].dWorldUpMatrix)
     net.ik_ctrls[2].worldMatrix[0].connect(net.ik_handles[0].dWorldUpMatrixEnd)

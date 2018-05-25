@@ -117,6 +117,10 @@ class BaseNode():
         return self.network.IK_HANDLE.connections()
 
     @property
+    def switch(self):
+        return self.network.SWITCH.connections()[0]
+
+    @property
     def ikHandlesAttr(self):
         return self.network.IK_HANDLE
 

@@ -40,12 +40,15 @@ def mirror_pose(obj):
     mirrored_obj = get_mirrored_obj(obj)
     pos = obj.getTranslation(worldSpace=False)
     rot = obj.getRotation(quaternion=True)
+    ikfk_value = obj.switch.IKFK.get()
+
 
     if not obj.hasAttr('Axis'):  # todo: add support for alternate mirror axis
         rot[0] = rot[0] * -1
         rot[3] = rot[3] * -1
         pos[0] = pos[0] * -1
         mirrored_obj.setTranslation(pos, worldSpace=False)
+        mirrored_obj.switch.IKFK.set(ikfk_value)
 
     mirrored_obj.setRotation(rot, quaternion=True)
 

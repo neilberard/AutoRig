@@ -57,8 +57,8 @@
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0">
-       <widget class="QPushButton" name="btn_build_humanoid">
+      <item row="1" column="1">
+       <widget class="QPushButton" name="btn_reset_rig">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -66,7 +66,33 @@
          </size>
         </property>
         <property name="text">
-         <string>Build Humanoid</string>
+         <string>Reset Rig </string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="btn_to_ik">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>To IK</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="btn_to_fk">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>To FK</string>
         </property>
        </widget>
       </item>
@@ -96,8 +122,8 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QPushButton" name="btn_to_fk">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="btn_build_humanoid">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -105,33 +131,30 @@
          </size>
         </property>
         <property name="text">
-         <string>To FK</string>
+         <string>Build Humanoid</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QPushButton" name="btn_to_ik">
+      <item row="4" column="0">
+       <widget class="QComboBox" name="cb_space">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>30</height>
+          <height>40</height>
          </size>
-        </property>
-        <property name="text">
-         <string>To IK</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="btn_reset_rig">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>30</height>
-         </size>
-        </property>
+      <item row="3" column="0">
+       <widget class="QLabel" name="lbl_cb_space">
         <property name="text">
-         <string>Reset Rig </string>
+         <string>Ctrl Space Snap</string>
         </property>
        </widget>
       </item>
@@ -345,7 +368,7 @@
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>../../../../../p4_avatars/tools/icons/GC_PWT_LockIcon.bmp</normaloff>../../../../../p4_avatars/tools/icons/GC_PWT_LockIcon.bmp</iconset>
+              <normaloff>../../../p4_avatars/tools/icons/GC_PWT_LockIcon.bmp</normaloff>../../../p4_avatars/tools/icons/GC_PWT_LockIcon.bmp</iconset>
             </property>
             <property name="checkable">
              <bool>false</bool>

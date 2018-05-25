@@ -1,4 +1,6 @@
 import maya.cmds as mc
+import siteCustomize
+import os
 
 
 def _null(*args):
@@ -10,10 +12,10 @@ class _shelf():
     it should be extended by the derived class to build the necessary shelf elements.
     By default it creates an empty shelf called "customShelf".'''
 
-    def __init__(self, name="Auto_Rig", iconPath=""):
+    def __init__(self, name="Auto_Rig"):
         self.name = name
 
-        self.iconPath = iconPath
+        self.iconPath = os.path.join(siteCustomize.ROOT_DIR, 'icons', 'autorig_toolset.png')
 
         self.labelBackground = (0, 0, 0, 0)
         self.labelColour = (.9, .9, .9)
@@ -27,18 +29,15 @@ class _shelf():
         elements. Otherwise, nothing is added to the shelf.'''
         pass
 
-    def addButton(self, label, icon="commandButton.png", command=_null, doubleCommand=_null):
+    def addButton(self, label, command=_null, doubleCommand=_null):
         '''Adds a shelf button with the specified label, command, double click command and image.'''
         mc.setParent(self.name)
-        if icon:
-            icon = self.iconPath + icon
-        mc.shelfButton(width=37, height=37, image=icon, l=label, command=command, dcc=doubleCommand, imageOverlayLabel=label, olb=self.labelBackground, olc=self.labelColour)
+        mc.shelfButton(width=37, height=37, image=self.iconPath, l=label, command=command, dcc=doubleCommand, imageOverlayLabel=label, olb=self.labelBackground, olc=self.labelColour)
 
     def addMenuItem(self, parent, label, command=_null, icon=""):
         '''Adds a shelf button with the specified label, command, double click command and image.'''
-        if icon:
-            icon = self.iconPath + icon
-        return mc.menuItem(p=parent, l=label, c=command, i="")
+
+        return mc.menuItem(p=parent, l=label, c=command, i=self.iconPath)
 
     def addSubMenu(self, parent, label, icon=None):
         '''Adds a sub menu item with the specified label and icon to the specified parent popup menu.'''
