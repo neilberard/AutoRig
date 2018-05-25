@@ -1,7 +1,8 @@
 import pymel.core as pymel
-from python.libs import virtual_classes, ikfk_switch
+from python.libs import virtual_classes, ikfk_switch, general_utils
 reload(ikfk_switch)
 reload(virtual_classes)
+reload(general_utils)
 
 
 def reset_rig():
@@ -10,6 +11,8 @@ def reset_rig():
             try:
                 obj.setRotation((0, 0, 0))
                 obj.setTranslation((0, 0, 0))
+                for attr in obj.listAttr(userDefined=True, scalar=True):
+                    attr.set(0)
             except:
                 pass
 
@@ -30,6 +33,8 @@ def get_mirrored_obj(obj):
             mirror_array = mirror_net.getAttr(net_attr.array().attrName())
             return mirror_array[net_attr.index()]
 
+
+@general_utils.undo
 def mirror_pose(obj):
 
     mirrored_obj = get_mirrored_obj(obj)

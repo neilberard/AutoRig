@@ -1,10 +1,10 @@
 import pymel.core as pymel
 
-from python.libs import joint_utils, virtual_classes
+from python.libs import joint_utils, virtual_classes, general_utils
 
 reload(joint_utils)
 reload(virtual_classes)
-
+reload(general_utils)
 
 def to_ik(net, select=True):
 
@@ -16,6 +16,21 @@ def to_ik(net, select=True):
         select = False
 
     switch = net.SWITCH.connections()[0]
+
+    # Match FK POS
+    ik_snap_target = net.IK_SNAP_LOC.connections()[0].getMatrix(worldSpace=True)
+
+    # Special cas for foot
+    if net.region == 'Leg':
+
+        toe_rotate_z = net.jnts[3].rotateZ.get()
+
+        if switch.IKFK.get() == 1:
+            net.ik_ctrls[0].setMatrix(ik_snap_target, worldSpace=True)
+        for attr in net.ik_ctrls[0].listAttr(userDefined=True, scalar=True):
+            attr.set(0)
+
+        net.ik_ctrls[0].Toe_Wiggle.set(toe_rotate_z)
 
     # Get Switch weight
     if switch.IKFK.get() == 1:
@@ -29,9 +44,6 @@ def to_ik(net, select=True):
         pole.setRotation(rot, space='world')  # Todo: Investigate mirrored rotation on the IK CTRL
 
         return
-
-    # Match FK POS
-    ik_snap_target = net.IK_SNAP_LOC.connections()[0].getMatrix(worldSpace=True)
 
     ik_ctrl = net.ik_ctrls[0]
     ik_ctrl.setMatrix(ik_snap_target, worldSpace=True)
@@ -78,12 +90,12 @@ def to_fk(net, select=True):
     if select:
         pymel.select(net.fk_ctrls[2])
 
-
+@general_utils.undo
 def switch_to_ik():
     for sel in pymel.selected():
         to_ik(sel.network)
 
-
+@general_utils.undo
 def switch_to_fk():
     for sel in pymel.selected():
         to_fk(sel.network)
