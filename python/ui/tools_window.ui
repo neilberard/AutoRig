@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>443</width>
-    <height>364</height>
+    <width>457</width>
+    <height>326</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -135,7 +135,52 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="3" column="1">
+       <widget class="QPushButton" name="btn_select_all_ctrls">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Select All CTRLs</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QPushButton" name="btn_select_limb">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Select Limb</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>200</y>
+       <width>431</width>
+       <height>80</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLabel" name="lbl_cb_space">
+        <property name="text">
+         <string>Ctrl Space Snap</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QComboBox" name="cb_space">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -151,15 +196,12 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="lbl_cb_space">
-        <property name="text">
-         <string>Ctrl Space Snap</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
+    <zorder>gridLayoutWidget_4</zorder>
+    <zorder>cb_space</zorder>
+    <zorder>cb_space</zorder>
+    <zorder>verticalLayoutWidget_2</zorder>
    </widget>
    <widget class="QWidget" name="tab_util">
     <property name="sizePolicy">

@@ -409,6 +409,7 @@ def build_main(ctrl_size=15, net=None):
     main_ctrl = build_ctrls.create_ctrl(name=main_name, shape='Arrows01', attr=net.MAIN_CTRL, size=ctrl_size, network=net, axis='Y')
 
 
+
 def build_space_switching(main_net):
 
     def make_space_grp(ctrl, orient=False, point=True, name='Space'):
@@ -491,11 +492,6 @@ def build_space_switching(main_net):
         pymel.parentConstraint([main_net.spine[0].ik_ctrls[0], main_net.legs[index].ik_jnts[0]], maintainOffset=True, skipRotate=('x', 'y', 'z'))
 
 
-
-
-
-
-
 def group_limb(net):
     # LimbGRP
     limb_grp_name = naming_utils.concatenate([net.side, net.region, 'GRP'])
@@ -531,7 +527,7 @@ def build_humanoid_rig(mirror=True):
     # Create Main
     main = virtual_classes.MainNode()
     pymel.rename(main, 'Main_Net')
-    naming_utils.add_tags(main, tags={'Type': 'MAIN', 'Region': 'MAIN', 'Side': 'Center'})
+    naming_utils.add_tags(main, tags={'Type': 'Main', 'Region': 'Main', 'Side': 'Center'})
 
     # Create Network Nodes
     for key in jnt_dict.keys():
@@ -547,7 +543,7 @@ def build_humanoid_rig(mirror=True):
             net.message.connect(main.ARMS[idx])
 
         elif info.region == 'Clavicle':
-            net = virtual_classes.LimbNode()
+            net = virtual_classes.ClavicleNode()
             idx = main.CLAVICLES.getNumElements()
             net.message.connect(main.CLAVICLES[idx])
 
@@ -575,7 +571,7 @@ def build_humanoid_rig(mirror=True):
 
     # Build Main
     for net in pymel.ls(type='network'):
-        if net.region == 'MAIN':
+        if net.region == 'Main':
             build_main(net=net)
 
     # Build Arms

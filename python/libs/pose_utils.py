@@ -17,6 +17,17 @@ def reset_rig():
                 pass
 
 
+def select_all_ctrls():
+    pymel.select(None)
+    selection_list = []
+
+    for obj in pymel.listTransforms():
+        if obj.hasAttr('Type') and obj.Type.get() == 'CTRL':
+            selection_list.append(obj)
+
+    pymel.select(selection_list)
+
+
 def get_mirrored_obj(obj):
     """
     Assumes that each set of limbs has only two elememts, Right or Left.
@@ -34,25 +45,56 @@ def get_mirrored_obj(obj):
             return mirror_array[net_attr.index()]
 
 
-@general_utils.undo
-def mirror_pose(obj):
+def get_mirror_data(obj):
+    """Returns mirrored obj with transforms{rot:'', pos:''} Note: Key 'Pos' not included with FK ctrls"""
 
-    mirrored_obj = get_mirrored_obj(obj)
+    transforms = {}
+
+    if obj.region == 'Spine' or obj.region == 'Head' or obj.region == 'Main':
+        mirrored_obj = obj
+
+    # Special case for clavicle since the ctrl has a separate network.
+    elif obj.network.region == 'Clavicle':
+        mirrored_obj = get_mirrored_obj(obj)
+        ikfk_value = obj.network.switch.IKFK.get()
+        mirrored_obj.network.switch.IKFK.set(ikfk_value)
+    else:
+        mirrored_obj = get_mirrored_obj(obj)
+        ikfk_value = obj.switch.IKFK.get()
+        mirrored_obj.switch.IKFK.set(ikfk_value)
+
     pos = obj.getTranslation(worldSpace=False)
     rot = obj.getRotation(quaternion=True)
-    ikfk_value = obj.switch.IKFK.get()
 
-
+    # For IK CTRLs that are oriented to worldspace and require mirrored position.
     if not obj.hasAttr('Axis'):  # todo: add support for alternate mirror axis
         rot[0] = rot[0] * -1
         rot[3] = rot[3] * -1
         pos[0] = pos[0] * -1
-        mirrored_obj.setTranslation(pos, worldSpace=False)
-        mirrored_obj.switch.IKFK.set(ikfk_value)
+        transforms['rot'] = rot
+        transforms['pos'] = pos
+    # Fk CTRL **Rotation only**
+    else:
+        transforms['rot'] = rot
 
-    mirrored_obj.setRotation(rot, quaternion=True)
+    return [mirrored_obj, transforms]
+
+@general_utils.undo
+def mirror_ctrls(ctrls):
+    mirror_data = []
+
+    for obj in ctrls:
+        data = get_mirror_data(obj)
+        mirror_data.append(data)
+
+    for obj, transform in mirror_data:
+
+        if 'pos' in transform:
+            obj.setTranslation(transform['pos'])
+
+        if 'rot' in transform:
+            obj.setRotation(transform['rot'])
+
 
 if __name__ == '__main__':
-    sel = pymel.selected()
-    for obj in sel:
-        mirror_pose(obj)
+    mirror_ctrls(pymel.selected())

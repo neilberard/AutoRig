@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 # Load UI File
-ui_path = ui_file_name = os.path.dirname(__file__) + r'\nb_tools.ui'
+ui_path = ui_file_name = os.path.dirname(__file__) + r'\tools_window.ui'
 FormClass, BaseClass = loadUiType(ui_file_name)
 
 
@@ -87,8 +87,7 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     @QtCore.Slot()
     def on_btn_mirror_ctrls_clicked(self):
         log.info('on_btn_mirror_ctrls_clicked')
-        for obj in pymel.selected():
-            pose_utils.mirror_pose(obj)
+        pose_utils.mirror_ctrls(pymel.selected())
 
     @QtCore.Slot()
     def on_btn_reset_rig_clicked(self):
@@ -104,6 +103,11 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     def on_btn_to_fk_clicked(self):
         log.info('on_btn_to_fk_clicked')
         ikfk_switch.switch_to_fk()
+
+    @QtCore.Slot()
+    def on_btn_select_all_ctrls_clicked(self):
+        log.info('btn_select_all_ctrls')
+        pose_utils.select_all_ctrls()
 
 
 
