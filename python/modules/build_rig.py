@@ -150,6 +150,15 @@ def build_ikfk_limb(jnts, net=None, fk_size=2.0, fk_shape='Circle', ik_size=1.0,
     joint_utils.create_offset_groups(pole, name='Offset', net=net)
     pymel.poleVectorConstraint(pole, ikhandle)
 
+    pole.addAttr('Offset', at='double3')
+    pole.addAttr('OffsetX', at='double', p='Offset', k=True)
+    pole.addAttr('OffsetY', at='double', p='Offset', k=True)
+    pole.addAttr('OffsetZ', at='double', p='Offset', k=True)
+
+    if net.region == 'Leg':
+        pole.Offset.set(180, 90, 90)
+
+
     # Annotation. Line between pole and mid ik_jnts joint
     anno_name = naming_utils.concatenate([net.jnts[1].name_info.base_name, net.jnts[1].name_info.joint_name])
     annotation, anno_parent, locator, point_constraint_a, point_constraint_b = general_utils.build_annotation(pole, net.ik_jnts[1], tags={'Network': net.name(), 'Region': net.Region.get(), 'Side': net.Side.get(), 'Utility': 'IK'}, net=net, name=anno_name)

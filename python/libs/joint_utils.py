@@ -42,6 +42,20 @@ def get_pole_position(joint_chain, pole_dist=20):
     :param pole_dist
     :return: pole position
     """
+    print joint_chain[0].region
+
+    if joint_chain[0].region == 'Leg':
+        axis = '-ZY'
+
+    elif joint_chain[0].region == 'Arm' and joint_chain[0].side == 'R':
+        axis = '+ZX'
+
+    elif joint_chain[0].region == 'Arm' and joint_chain[0].side == 'L':
+        axis = '-ZX'
+
+
+
+
     vector_a = om.MVector(joint_chain[0].getTranslation(space='world'))
     vector_b = om.MVector(joint_chain[1].getTranslation(space='world'))
     vector_c = om.MVector(joint_chain[2].getTranslation(space='world'))
@@ -63,18 +77,41 @@ def get_pole_position(joint_chain, pole_dist=20):
 
     finalV = arrowV + vector_b
 
+
     # Add orientation
-    cross1 = start_end ^ start_mid
+    cross1 = start_end ^ start_mid  # X Axis
     cross1.normalize()
 
     cross2 = cross1 ^ arrowV
     cross2.normalize()
     arrowV.normalize()
 
-    matrixV = [arrowV.x, arrowV.y, arrowV.z, 0,
-               cross1.x, cross1.y, cross1.z, 0,
-               cross2.x, cross2.y, cross2.z, 0,
-               0, 0, 0, 1]
+
+    # Legs Orientation
+    if axis == '-ZY':
+        print 'Legs'
+        matrixV = [cross1.x * -1, cross1.y * -1, cross1.z * -1, 0,  # Perpendicular to plane
+                   cross2.x, cross2.y, cross2.z, 0, # Parallel to the plane
+                   arrowV.x * -1, arrowV.y * -1, arrowV.z * -1, 0,  # AIM vector
+                   0, 0, 0, 1]
+
+    # ARM Mirrored (Left)
+    if axis == '-ZX':
+        print 'left arm'
+
+        matrixV = [cross2.x * -1, cross2.y * -1, cross2.z * -1, 0,  # Perpendicular to plane
+                   cross1.x, cross1.y, cross1.z, 0, # Parallel to the plane
+                   arrowV.x * -1, arrowV.y * -1, arrowV.z * -1, 0,  # AIM vector
+                   0, 0, 0, 1]
+    # ARM (Right)
+    if axis == '+ZX':
+        print 'Right arm'
+
+        matrixV = [cross2.x, cross2.y, cross2.z, 0,  # Perpendicular to plane
+                   cross1.x * -1, cross1.y * -1, cross1.z * -1, 0,  # Parallel to the plane
+                   arrowV.x, arrowV.y, arrowV.z, 0,  # AIM vector
+                   0, 0, 0, 1]
+
     matrixM = om.MMatrix()
     om.MScriptUtil.createMatrixFromList(matrixV, matrixM)
     matrixFn = om.MTransformationMatrix(matrixM)
@@ -165,13 +202,6 @@ def rebuild_joint_chain(joint_list, name, net):
             child.setParent(jnt)
 
         new_joints.append(new_jnt)
-
-        # Add Virtual Class
-        # try:
-        #     virtual_class_hs.attach_class(new_jnt)
-        # except Exception as ex:
-        #     log.warning(ex)
-
 
         # Tags
         naming_utils.add_tags(new_jnt, tags={'Network': net.name(), 'Utility': name})

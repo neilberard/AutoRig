@@ -55,7 +55,10 @@ class BaseNode():
     @property
     def network(self):
         if self.message.connections():
-            return self.message.connections()[0]
+            for object in self.message.connections():
+                if object.hasAttr('_class'):
+                    return object
+
 
     @property
     def main(self):

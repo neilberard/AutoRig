@@ -4,7 +4,7 @@ reload(ikfk_switch)
 reload(virtual_classes)
 reload(general_utils)
 
-
+@general_utils.undo
 def reset_rig():
     for obj in pymel.listTransforms():
         if obj.hasAttr('Type') and obj.Type.get() == 'CTRL':
@@ -12,7 +12,8 @@ def reset_rig():
                 obj.setRotation((0, 0, 0))
                 obj.setTranslation((0, 0, 0))
                 for attr in obj.listAttr(userDefined=True, scalar=True):
-                    attr.set(0)
+                    if attr.name() != 'Offset':
+                        attr.set(0)
             except:
                 pass
 

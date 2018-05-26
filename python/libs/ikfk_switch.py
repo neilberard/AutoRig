@@ -7,6 +7,7 @@ reload(virtual_classes)
 reload(general_utils)
 
 def to_ik(net, select=True):
+    print 'UPDATED!'
 
     # Special case for Clavicle since it is not connected to the arm network.
     if net.region == 'Clavicle':
@@ -39,7 +40,7 @@ def to_ik(net, select=True):
         distance = joint_utils.get_distance(net.ik_jnts[0],
                                             net.ik_jnts[1])
 
-        pos, rot = joint_utils.get_pole_position(net.IK_JOINTS.connections(), pole_dist=distance * 0.5)
+        pos, rot = joint_utils.get_pole_position(net.ik_jnts, pole_dist=distance * 0.5)
         pole.setTranslation(pos, space='world')
         pole.setRotation(rot, space='world')  # Todo: Investigate mirrored rotation on the IK CTRL
 
@@ -53,7 +54,7 @@ def to_ik(net, select=True):
                                         net.FK_JOINTS.connections()[1])
 
     pole = net.POLE.connections()[0]
-    pos, rot = joint_utils.get_pole_position(net.FK_JOINTS.connections(), pole_dist=distance * 0.5)
+    pos, rot = joint_utils.get_pole_position(net.fk_jnts, pole_dist=distance * 0.5)
     pole.setTranslation(pos, space='world')
     pole.setRotation(rot, space='world')
 
