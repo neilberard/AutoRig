@@ -267,7 +267,8 @@ def build_spine(jnts, net=None):
     # Chest CTRL
     chest_ctrl = make_ctrl(net.jnts[3], children=net.clusters[3:5], shape='Chest')
     # COG
-    cog = build_ctrls.create_ctrl(jnt=net.jnts[1], network=net, attr=net.COG, shape='Circle', size=5, name='COG', offset=False)
+    cog = build_ctrls.create_ctrl(network=net, attr=net.COG, shape='Circle', size=5, name='COG', offset=False, axis='Y')
+    cog.setTranslation(net.jnts[1].getTranslation(worldSpace=True))
 
     chest_ctrl.setParent(mid_ctrl)
     mid_ctrl.setParent(cog)

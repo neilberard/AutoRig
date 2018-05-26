@@ -340,6 +340,10 @@ class MainNode(pymel.nodetypes.Network, BaseNode):
         return self
 
     @property
+    def jnts(self):
+        return []
+
+    @property
     def main_ctrl(self):
         return self.MAIN_CTRL.connections()
 
