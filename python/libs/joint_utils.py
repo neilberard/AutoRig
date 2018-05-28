@@ -82,7 +82,7 @@ def get_pole_position(joint_chain, pole_dist=20):
     cross1 = start_end ^ start_mid  # X Axis
     cross1.normalize()
 
-    cross2 = cross1 ^ arrowV
+    cross2 = cross1 ^ arrowV #Y
     cross2.normalize()
     arrowV.normalize()
 
