@@ -37,8 +37,10 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
         maya_main = wrapInstance(long(omui.MQtUtil.mainWindow()), QtWidgets.QWidget)  # GET MAIN MAYA WINDOW
         super(ToolsWindow, self).__init__(maya_main)  # PARENT WINDOW
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)  # DELETE WINDOW ON CLOSE
+
         log.info(self.__class__.__name__)
         self.setupUi(self)
+        self.pb_main.hide()
 
     # @QtCore.Slot(): Decorator based on widget name that connects QT signal.
     @QtCore.Slot()
@@ -77,7 +79,10 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     @QtCore.Slot()
     def on_btn_build_humanoid_clicked(self):
         log.info('on_btn_build_humanoid_clicked')
-        build_rig.build_humanoid_rig(mirror=False)
+        self.progress_bar = QtWidgets.QProgressBar(self)
+        self.pb_main.setValue(0)
+        self.pb_main.show()
+        build_rig.build_humanoid_rig(self.pb_main, mirror=False)
 
     @QtCore.Slot()
     def on_btn_delete_all_ctrls_clicked(self):
@@ -108,10 +113,6 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     def on_btn_select_all_ctrls_clicked(self):
         log.info('btn_select_all_ctrls')
         pose_utils.select_all_ctrls()
-
-
-
-
 
 
 def showUI():

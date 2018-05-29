@@ -419,7 +419,6 @@ def build_main(ctrl_size=15, net=None):
     main_ctrl = build_ctrls.create_ctrl(name=main_name, shape='Arrows01', attr=net.MAIN_CTRL, size=ctrl_size, network=net, axis='Y')
 
 
-
 def build_space_switching(main_net):
 
     def make_space_grp(ctrl, orient=False, point=True, name='Space'):
@@ -522,7 +521,7 @@ def group_limb(net):
 
 
 @general_utils.undo
-def build_humanoid_rig(mirror=True):
+def build_humanoid_rig(progress_bar, mirror=True):
 
     jnt_dict = {}
     for jnt in pymel.ls(type='joint'):
@@ -533,6 +532,8 @@ def build_humanoid_rig(mirror=True):
             jnt_dict[key].append(jnt)
         elif info.region:
             jnt_dict[key] = [jnt]
+
+    progress_bar.setMaximum(len(jnt_dict))
 
     # Create Main
     main = virtual_classes.MainNode()
@@ -583,6 +584,7 @@ def build_humanoid_rig(mirror=True):
     for net in pymel.ls(type='network'):
         if net.region == 'Main':
             build_main(net=net)
+            progress_bar.setValue(progress_bar.value() + 1)
 
     # Build Arms
     for net in pymel.ls(type='network'):
@@ -591,6 +593,8 @@ def build_humanoid_rig(mirror=True):
             pymel.orientConstraint([net.ik_ctrls[0], net.ik_jnts[2]], maintainOffset=True)
             grp = group_limb(net)
             grp.setParent(main.main_ctrl[0])
+            progress_bar.setValue(progress_bar.value() + 1)
+
 
     # Build Clavicle
     for net in pymel.ls(type='network'):
@@ -598,6 +602,7 @@ def build_humanoid_rig(mirror=True):
             build_clavicle(jnts=net.jnts, net=net)
             grp = group_limb(net)
             grp.setParent(main.main_ctrl[0])
+            progress_bar.setValue(progress_bar.value() + 1)
 
     # Build Legs
     for net in pymel.ls(type='network'):
@@ -606,6 +611,7 @@ def build_humanoid_rig(mirror=True):
             build_reverse_foot_rig(net=net)
             grp = group_limb(net)
             grp.setParent(main.main_ctrl[0])
+            progress_bar.setValue(progress_bar.value() + 1)
 
     # Build IK Spline
     for net in pymel.ls(type='network'):
@@ -613,6 +619,7 @@ def build_humanoid_rig(mirror=True):
             build_spine(jnts=net.jnts, net=net)
             grp = group_limb(net)
             grp.setParent(main.main_ctrl[0])
+            progress_bar.setValue(progress_bar.value() + 1)
 
     # Build Head
     for net in pymel.ls(type='network'):
@@ -620,9 +627,13 @@ def build_humanoid_rig(mirror=True):
             build_head(jnts=net.jnts, net=net)
             grp = group_limb(net)
             grp.setParent(main.main_ctrl[0])
+            progress_bar.setValue(progress_bar.value() + 1)
 
     # Build Space Switching
     build_space_switching(main_net=main)
+    progress_bar.setValue(progress_bar.maximum())
+    progress_bar.hide()
+
 
 """TEST CODE"""
 

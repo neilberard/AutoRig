@@ -1,6 +1,6 @@
 //Maya ASCII 2017 scene
 //Name: RollJoints.ma
-//Last modified: Mon, May 28, 2018 12:25:05 PM
+//Last modified: Mon, May 28, 2018 08:55:40 PM
 //Codeset: 1252
 requires maya "2017";
 requires -nodeType "HIKSolverNode" -nodeType "HIKCharacterNode" -nodeType "HIKSkeletonGeneratorNode"
@@ -21,13 +21,13 @@ fileInfo "osv" "Microsoft Windows 8 Home Premium Edition, 64-bit  (Build 9200)\n
 createNode transform -s -n "persp";
 	rename -uid "7D779CA1-401D-2B0E-0C5E-81B61A19217F";
 	setAttr ".v" no;
-	setAttr ".t" -type "double3" 117.23286343373543 314.30418354638709 26.407640588907171 ;
-	setAttr ".r" -type "double3" 2459.0947343605244 11913.800000001142 -3.8274538202662283e-015 ;
+	setAttr ".t" -type "double3" 70.114136343644631 273.24264568802982 47.126713376303925 ;
+	setAttr ".r" -type "double3" 2462.694734360316 12234.600000000695 1.1980248823818549e-015 ;
 createNode camera -s -n "perspShape" -p "persp";
 	rename -uid "11025A09-4A86-E29B-9D93-DCA8C770D120";
 	setAttr -k off ".v" no;
 	setAttr ".fcp" 100000;
-	setAttr ".coi" 183.1850527385553;
+	setAttr ".coi" 105.35248999368777;
 	setAttr ".imn" -type "string" "persp";
 	setAttr ".den" -type "string" "persp_depth";
 	setAttr ".man" -type "string" "persp_mask";
@@ -886,7 +886,6 @@ createNode joint -n "L_Shoulder" -p "L_Clavicle";
 	setAttr ".uoc" 1;
 	setAttr ".oc" 6;
 	setAttr ".t" -type "double3" 26.629929973811425 2.2453150450019166e-012 -2.7977620220553945e-014 ;
-	setAttr ".r" -type "double3" 4.9696166897867462e-017 -1.5902773407317584e-015 3.975693351829396e-016 ;
 	setAttr ".ro" 2;
 	setAttr ".mnrl" -type "double3" -360 -360 -360 ;
 	setAttr ".mxrl" -type "double3" 360 360 360 ;
@@ -1133,8 +1132,6 @@ createNode joint -n "L_Arm_Roll_01" -p "L_Shoulder";
 	addAttr -ci true -sn "Network" -ln "Network" -dt "string";
 	setAttr ".uoc" 1;
 	setAttr ".oc" 6;
-	setAttr ".t" -type "double3" 0 2.8421709430404007e-014 1.7763568394002505e-015 ;
-	setAttr ".r" -type "double3" 4.9696166897867462e-017 -1.5902773407317584e-015 3.975693351829396e-016 ;
 	setAttr ".ro" 2;
 	setAttr ".mnrl" -type "double3" -360 -360 -360 ;
 	setAttr ".mxrl" -type "double3" 360 360 360 ;
@@ -1144,14 +1141,48 @@ createNode joint -n "L_Arm_Roll_01" -p "L_Shoulder";
 		 39.593900000000104 195.83500000000154 -13.745500000000028 1;
 	setAttr ".radi" 27.900000000000002;
 	setAttr ".Network" -type "string" "L_Arm_Net";
+createNode pointConstraint -n "L_Arm_Roll_01_pointConstraint1" -p "L_Arm_Roll_01";
+	rename -uid "55F225A4-44E4-9CEE-E8C0-619DAA1AE792";
+	addAttr -dcb 0 -ci true -k true -sn "w0" -ln "defDriver_l_arm_roll_01W0" -dv 1 
+		-min 0 -at "double";
+	setAttr -k on ".nds";
+	setAttr -k off ".v";
+	setAttr -k off ".tx";
+	setAttr -k off ".ty";
+	setAttr -k off ".tz";
+	setAttr -k off ".rx";
+	setAttr -k off ".ry";
+	setAttr -k off ".rz";
+	setAttr -k off ".sx";
+	setAttr -k off ".sy";
+	setAttr -k off ".sz";
+	setAttr ".erp" yes;
+	setAttr ".o" -type "double3" 0 -2.8421709430404007e-014 -1.7763568394002505e-015 ;
+	setAttr ".rst" -type "double3" 0 2.8421709430404007e-014 1.7763568394002505e-015 ;
+	setAttr -k on ".w0";
+createNode orientConstraint -n "L_Arm_Roll_01_orientConstraint1" -p "L_Arm_Roll_01";
+	rename -uid "D955C99C-4DFD-C0BC-2697-D69BA03B70C8";
+	addAttr -dcb 0 -ci true -k true -sn "w0" -ln "defDriver_l_arm_roll_01W0" -dv 1 
+		-min 0 -at "double";
+	setAttr -k on ".nds";
+	setAttr -k off ".v";
+	setAttr -k off ".tx";
+	setAttr -k off ".ty";
+	setAttr -k off ".tz";
+	setAttr -k off ".rx";
+	setAttr -k off ".ry";
+	setAttr -k off ".rz";
+	setAttr -k off ".sx";
+	setAttr -k off ".sy";
+	setAttr -k off ".sz";
+	setAttr ".erp" yes;
+	setAttr -k on ".w0";
 createNode joint -n "L_Arm_Roll_02" -p "L_Shoulder";
 	rename -uid "38B26902-4040-04F0-E214-CE8E8E8FA9FD";
 	addAttr -ci true -sn "liw" -ln "lockInfluenceWeights" -min 0 -max 1 -at "bool";
 	addAttr -ci true -sn "Network" -ln "Network" -dt "string";
 	setAttr ".uoc" 1;
 	setAttr ".oc" 6;
-	setAttr ".t" -type "double3" 25.420261124403449 -6.3108872417680944e-030 7.1054273576010082e-015 ;
-	setAttr ".r" -type "double3" 4.9696166897867462e-017 -1.5902773407317584e-015 3.975693351829396e-016 ;
 	setAttr ".ro" 2;
 	setAttr ".mnrl" -type "double3" -360 -360 -360 ;
 	setAttr ".mxrl" -type "double3" 360 360 360 ;
@@ -1160,6 +1191,42 @@ createNode joint -n "L_Arm_Roll_02" -p "L_Shoulder";
 		 39.593900000000104 195.83500000000154 -13.745500000000028 1;
 	setAttr ".radi" 27.900000000000002;
 	setAttr ".Network" -type "string" "L_Arm_Net";
+createNode pointConstraint -n "L_Arm_Roll_02_pointConstraint1" -p "L_Arm_Roll_02";
+	rename -uid "CFE10481-4724-915D-3A19-3C89AC055FA8";
+	addAttr -dcb 0 -ci true -k true -sn "w0" -ln "defDriver_l_arm_roll_02W0" -dv 1 
+		-min 0 -at "double";
+	setAttr -k on ".nds";
+	setAttr -k off ".v";
+	setAttr -k off ".tx";
+	setAttr -k off ".ty";
+	setAttr -k off ".tz";
+	setAttr -k off ".rx";
+	setAttr -k off ".ry";
+	setAttr -k off ".rz";
+	setAttr -k off ".sx";
+	setAttr -k off ".sy";
+	setAttr -k off ".sz";
+	setAttr ".erp" yes;
+	setAttr ".o" -type "double3" -1.7763568394002505e-014 -2.8421709430404014e-014 -3.5527136788004946e-015 ;
+	setAttr ".rst" -type "double3" 25.420261124403449 -6.3108872417680944e-030 7.1054273576010082e-015 ;
+	setAttr -k on ".w0";
+createNode orientConstraint -n "L_Arm_Roll_02_orientConstraint1" -p "L_Arm_Roll_02";
+	rename -uid "768AD1A2-4E35-BC08-21D8-6CAABC25CC70";
+	addAttr -dcb 0 -ci true -k true -sn "w0" -ln "defDriver_l_arm_roll_02W0" -dv 1 
+		-min 0 -at "double";
+	setAttr -k on ".nds";
+	setAttr -k off ".v";
+	setAttr -k off ".tx";
+	setAttr -k off ".ty";
+	setAttr -k off ".tz";
+	setAttr -k off ".rx";
+	setAttr -k off ".ry";
+	setAttr -k off ".rz";
+	setAttr -k off ".sx";
+	setAttr -k off ".sy";
+	setAttr -k off ".sz";
+	setAttr ".erp" yes;
+	setAttr -k on ".w0";
 createNode joint -n "R_Clavicle" -p "Chest";
 	rename -uid "609123CD-4320-67B5-D08B-B9BD0DF95A62";
 	addAttr -ci true -sn "liw" -ln "lockInfluenceWeights" -min 0 -max 1 -at "bool";
@@ -12744,6 +12811,14 @@ createNode mesh -n "Body2ShapeOrig" -p "Body2";
 	setAttr ".ns" 0.1;
 createNode transform -n "l_arm_roll_vecDriverJoint_grp";
 	rename -uid "6020E5DA-49BD-5C22-94F6-EBA8BA77E048";
+	setAttr ".t" -type "double3" 39.593898773193359 195.83500671386719 -13.745499610900879 ;
+	setAttr -av ".tx";
+	setAttr -av ".ty";
+	setAttr -av ".tz";
+	setAttr ".r" -type "double3" -0.8953029097455405 15.030466961687788 -3.4484451381863264 ;
+	setAttr -av ".rx";
+	setAttr -av ".ry";
+	setAttr -av ".rz";
 createNode parentConstraint -n "l_arm_roll_vecDriverJoint_grp_parentConstraint1" 
 		-p "l_arm_roll_vecDriverJoint_grp";
 	rename -uid "48378373-45FC-FB61-DD9C-7587B4F3C12C";
@@ -12767,7 +12842,7 @@ createNode parentConstraint -n "l_arm_roll_vecDriverJoint_grp_parentConstraint1"
 createNode joint -n "l_arm_roll_vecDriverJoint" -p "l_arm_roll_vecDriverJoint_grp";
 	rename -uid "AA6C52AF-4BAA-F318-E86B-CC865E4D0ACF";
 	setAttr ".t" -type "double3" -8.1076053429367274 -2.0213983224226979 -23.067027686246696 ;
-	setAttr ".r" -type "double3" 179.50197977853267 -11.457735445901424 2.505528100391301 ;
+	setAttr ".r" -type "double3" -179.49111705965746 11.711349405026947 2.5055281003913685 ;
 	setAttr ".mnrl" -type "double3" -360 -360 -360 ;
 	setAttr ".mxrl" -type "double3" 360 360 360 ;
 	setAttr ".jo" -type "double3" -2.6040217024847276e-014 -15.056494673631157 3.3303317401418706 ;
@@ -12778,18 +12853,18 @@ createNode joint -n "End_L_Arm_roll_vecDriverJoint" -p "l_arm_roll_vecDriverJoin
 	setAttr ".mnrl" -type "double3" -360 -360 -360 ;
 	setAttr ".mxrl" -type "double3" 360 360 360 ;
 	setAttr ".radi" 10;
+createNode transform -n "defDriver_l_arm_roll_01_aimUp" -p "End_L_Arm_roll_vecDriverJoint";
+	rename -uid "C09EA231-499D-27E8-A097-1FB1C930F849";
+	setAttr ".t" -type "double3" 14.870956414003828 1.2309829710075064 12.881412545646384 ;
+	setAttr ".r" -type "double3" -179.99999657331406 11.72224595171955 2.4533380321037468 ;
+	setAttr ".s" -type "double3" 0.99999999999999989 1 1 ;
+createNode locator -n "defDriver_l_arm_roll_01_aimUpShape" -p "defDriver_l_arm_roll_01_aimUp";
+	rename -uid "1CEEF868-4FD2-CEB3-9240-9195BDAD2DB6";
+	setAttr -k off ".v";
 createNode ikEffector -n "effector1" -p "l_arm_roll_vecDriverJoint";
 	rename -uid "DF52245D-4203-BD2B-8669-73A94C7FD863";
 	setAttr ".v" no;
 	setAttr ".hd" yes;
-createNode transform -n "defDriver_l_arm_roll_01_aimUp" -p "l_arm_roll_vecDriverJoint";
-	rename -uid "C09EA231-499D-27E8-A097-1FB1C930F849";
-	setAttr ".t" -type "double3" 63.422334712045611 2.7198071689270193 11.107633169259838 ;
-	setAttr ".r" -type "double3" -179.99999529965331 -14.607264812588568 2.455564600231932 ;
-	setAttr ".s" -type "double3" 1 1.0000000000000002 1.0000000000000002 ;
-createNode locator -n "defDriver_l_arm_roll_01_aimUpShape" -p "defDriver_l_arm_roll_01_aimUp";
-	rename -uid "1CEEF868-4FD2-CEB3-9240-9195BDAD2DB6";
-	setAttr -k off ".v";
 createNode transform -n "l_arm_roll_vecDriverJoint_ikPV" -p "l_arm_roll_vecDriverJoint_grp";
 	rename -uid "5D0A0495-4A53-C371-4E58-F1AF9CB839DB";
 	setAttr ".t" -type "double3" -8.5862547733025565 6.2041216166957156 -23.067028330746407 ;
@@ -12803,24 +12878,6 @@ createNode ikHandle -n "l_arm_roll_vecDriverJoint_ikhandle" -p "l_arm_roll_vecDr
 	setAttr ".r" -type "double3" 5.1462879495745597e-017 -15.056494673631153 3.3303317401418706 ;
 	setAttr ".s" -type "double3" 1.0000000000000002 1.0000000000000002 1.0000000000000002 ;
 	setAttr ".roc" yes;
-createNode pointConstraint -n "ikHandle1_pointConstraint1" -p "l_arm_roll_vecDriverJoint_ikhandle";
-	rename -uid "B5287752-4E1A-9D87-3029-C89324F83C8A";
-	addAttr -dcb 0 -ci true -k true -sn "w0" -ln "L_ElbowW0" -dv 1 -min 0 -at "double";
-	setAttr -k on ".nds";
-	setAttr -k off ".v";
-	setAttr -k off ".tx";
-	setAttr -k off ".ty";
-	setAttr -k off ".tz";
-	setAttr -k off ".rx";
-	setAttr -k off ".ry";
-	setAttr -k off ".rz";
-	setAttr -k off ".sx";
-	setAttr -k off ".sy";
-	setAttr -k off ".sz";
-	setAttr ".erp" yes;
-	setAttr ".o" -type "double3" -36.566600000000008 6.7138654458176461e-006 -10.660159086006264 ;
-	setAttr ".rst" -type "double3" 50 195.83500671386719 -26.981559086006119 ;
-	setAttr -k on ".w0";
 createNode poleVectorConstraint -n "l_arm_roll_vecDriverJoint_ikhandle_poleVectorConstraint1" 
 		-p "l_arm_roll_vecDriverJoint_ikhandle";
 	rename -uid "EC490275-43D3-88C6-A4E9-48A6AE8076F9";
@@ -12839,6 +12896,25 @@ createNode poleVectorConstraint -n "l_arm_roll_vecDriverJoint_ikhandle_poleVecto
 	setAttr -k off ".sz";
 	setAttr ".erp" yes;
 	setAttr ".rst" -type "double3" 0 8.2394346617971337 -6.6741185023033722e-007 ;
+	setAttr -k on ".w0";
+createNode pointConstraint -n "l_arm_roll_vecDriverJoint_ikhandle_pointConstraint1" 
+		-p "l_arm_roll_vecDriverJoint_ikhandle";
+	rename -uid "96D495C0-4203-8D5B-C2BC-9AA8CD2AA9EA";
+	addAttr -dcb 0 -ci true -k true -sn "w0" -ln "L_ElbowW0" -dv 1 -min 0 -at "double";
+	setAttr -k on ".nds";
+	setAttr -k off ".v";
+	setAttr -k off ".tx";
+	setAttr -k off ".ty";
+	setAttr -k off ".tz";
+	setAttr -k off ".rx";
+	setAttr -k off ".ry";
+	setAttr -k off ".rz";
+	setAttr -k off ".sx";
+	setAttr -k off ".sy";
+	setAttr -k off ".sz";
+	setAttr ".erp" yes;
+	setAttr ".o" -type "double3" -4.3980969927836568 0.33837484404301676 -29.876345739552185 ;
+	setAttr ".rst" -type "double3" 41.553450125095573 3.0123255094164563 -20.161654356398401 ;
 	setAttr -k on ".w0";
 createNode transform -n "defDriver_l_arm_roll_grp";
 	rename -uid "57BAF916-4E09-62FD-4752-E68047AF83F7";
@@ -12867,7 +12943,7 @@ createNode joint -n "defDriver_l_arm_roll_02" -p "defDriver_l_arm_roll_grp";
 	addAttr -ci true -sn "Network" -ln "Network" -dt "string";
 	setAttr ".uoc" 1;
 	setAttr ".oc" 6;
-	setAttr ".r" -type "double3" 4.9696166897867462e-017 -1.5902773407317584e-015 3.975693351829396e-016 ;
+	setAttr ".r" -type "double3" 4.9696166897867462e-017 0 3.975693351829396e-016 ;
 	setAttr ".ro" 2;
 	setAttr ".mnrl" -type "double3" -360 -360 -360 ;
 	setAttr ".mxrl" -type "double3" 360 360 360 ;
@@ -12920,7 +12996,7 @@ createNode joint -n "defDriver_l_arm_roll_twistMod" -p "defDriver_l_arm_roll_01"
 	addAttr -ci true -sn "Network" -ln "Network" -dt "string";
 	setAttr ".uoc" 1;
 	setAttr ".oc" 6;
-	setAttr ".r" -type "double3" 4.9696166897867462e-017 -1.5902773407317584e-015 3.975693351829396e-016 ;
+	setAttr ".r" -type "double3" 4.9696166897867462e-017 0 3.975693351829396e-016 ;
 	setAttr ".ro" 2;
 	setAttr ".mnrl" -type "double3" -360 -360 -360 ;
 	setAttr ".mxrl" -type "double3" 360 360 360 ;
@@ -12946,6 +13022,150 @@ createNode aimConstraint -n "defDriver_l_arm_roll_01_aimConstraint1" -p "defDriv
 	setAttr ".erp" yes;
 	setAttr ".u" -type "double3" 0 0 -1 ;
 	setAttr ".wut" 1;
+	setAttr -k on ".w0";
+createNode transform -n "pCube1";
+	rename -uid "687FB661-4225-A3A1-C588-2CBED101ED8B";
+	setAttr ".ro" 2;
+createNode mesh -n "pCubeShape1" -p "pCube1";
+	rename -uid "3261ED32-4A9D-8A7E-E425-199299A6BBE5";
+	setAttr -k off ".v";
+	setAttr ".vir" yes;
+	setAttr ".vif" yes;
+	setAttr ".uvst[0].uvsn" -type "string" "map1";
+	setAttr -s 14 ".uvst[0].uvsp[0:13]" -type "float2" 0.375 0 0.625 0 0.375
+		 0.25 0.625 0.25 0.375 0.5 0.625 0.5 0.375 0.75 0.625 0.75 0.375 1 0.625 1 0.875 0
+		 0.875 0.25 0.125 0 0.125 0.25;
+	setAttr ".cuvs" -type "string" "map1";
+	setAttr ".dcc" -type "string" "Ambient+Diffuse";
+	setAttr ".covm[0]"  0 1 1;
+	setAttr ".cdvm[0]"  0 1 1;
+	setAttr -s 8 ".vt[0:7]"  -5 -5 5 5 -5 5 -5 5 5 5 5 5 -5 5 -5 5 5 -5
+		 -5 -5 -5 5 -5 -5;
+	setAttr -s 12 ".ed[0:11]"  0 1 0 2 3 0 4 5 0 6 7 0 0 2 0 1 3 0 2 4 0
+		 3 5 0 4 6 0 5 7 0 6 0 0 7 1 0;
+	setAttr -s 6 -ch 24 ".fc[0:5]" -type "polyFaces" 
+		f 4 0 5 -2 -5
+		mu 0 4 0 1 3 2
+		f 4 1 7 -3 -7
+		mu 0 4 2 3 5 4
+		f 4 2 9 -4 -9
+		mu 0 4 4 5 7 6
+		f 4 3 11 -1 -11
+		mu 0 4 6 7 9 8
+		f 4 -12 -10 -8 -6
+		mu 0 4 1 10 11 3
+		f 4 10 4 6 8
+		mu 0 4 12 0 2 13;
+	setAttr ".cd" -type "dataPolyComponent" Index_Data Edge 0 ;
+	setAttr ".cvd" -type "dataPolyComponent" Index_Data Vertex 0 ;
+	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
+	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
+createNode pointConstraint -n "pCube1_pointConstraint1" -p "pCube1";
+	rename -uid "CAE70926-4642-1CAF-EAC3-9D8245513A3C";
+	addAttr -dcb 0 -ci true -k true -sn "w0" -ln "L_Arm_Roll_02W0" -dv 1 -min 0 -at "double";
+	setAttr -k on ".nds";
+	setAttr -k off ".v";
+	setAttr -k off ".tx";
+	setAttr -k off ".ty";
+	setAttr -k off ".tz";
+	setAttr -k off ".rx";
+	setAttr -k off ".ry";
+	setAttr -k off ".rz";
+	setAttr -k off ".sx";
+	setAttr -k off ".sy";
+	setAttr -k off ".sz";
+	setAttr ".erp" yes;
+	setAttr ".rst" -type "double3" 64.976024803726261 195.83500000000154 -15.137410945760399 ;
+	setAttr -k on ".w0";
+createNode orientConstraint -n "pCube1_orientConstraint1" -p "pCube1";
+	rename -uid "95F66E24-4694-6B7B-6792-75A9F5DAAAAE";
+	addAttr -dcb 0 -ci true -k true -sn "w0" -ln "L_Arm_Roll_02W0" -dv 1 -min 0 -at "double";
+	setAttr -k on ".nds";
+	setAttr -k off ".v";
+	setAttr -k off ".tx";
+	setAttr -k off ".ty";
+	setAttr -k off ".tz";
+	setAttr -k off ".rx";
+	setAttr -k off ".ry";
+	setAttr -k off ".rz";
+	setAttr -k off ".sx";
+	setAttr -k off ".sy";
+	setAttr -k off ".sz";
+	setAttr ".erp" yes;
+	setAttr ".lr" -type "double3" 0 3.1388555656179706 0 ;
+	setAttr ".rsrr" -type "double3" 0 3.1388555656179706 0 ;
+	setAttr -k on ".w0";
+createNode transform -n "pCube2";
+	rename -uid "81CF44F6-4C6E-B373-65C4-EBAF6A5A21DF";
+	setAttr ".ro" 2;
+createNode mesh -n "pCubeShape2" -p "pCube2";
+	rename -uid "26B571A8-4F30-5005-6F1C-4BAB566D36A7";
+	setAttr -k off ".v";
+	setAttr ".vir" yes;
+	setAttr ".vif" yes;
+	setAttr ".uvst[0].uvsn" -type "string" "map1";
+	setAttr -s 14 ".uvst[0].uvsp[0:13]" -type "float2" 0.375 0 0.625 0 0.375
+		 0.25 0.625 0.25 0.375 0.5 0.625 0.5 0.375 0.75 0.625 0.75 0.375 1 0.625 1 0.875 0
+		 0.875 0.25 0.125 0 0.125 0.25;
+	setAttr ".cuvs" -type "string" "map1";
+	setAttr ".dcc" -type "string" "Ambient+Diffuse";
+	setAttr ".covm[0]"  0 1 1;
+	setAttr ".cdvm[0]"  0 1 1;
+	setAttr -s 8 ".vt[0:7]"  -5 -5 5 5 -5 5 -5 5 5 5 5 5 -5 5 -5 5 5 -5
+		 -5 -5 -5 5 -5 -5;
+	setAttr -s 12 ".ed[0:11]"  0 1 0 2 3 0 4 5 0 6 7 0 0 2 0 1 3 0 2 4 0
+		 3 5 0 4 6 0 5 7 0 6 0 0 7 1 0;
+	setAttr -s 6 -ch 24 ".fc[0:5]" -type "polyFaces" 
+		f 4 0 5 -2 -5
+		mu 0 4 0 1 3 2
+		f 4 1 7 -3 -7
+		mu 0 4 2 3 5 4
+		f 4 2 9 -4 -9
+		mu 0 4 4 5 7 6
+		f 4 3 11 -1 -11
+		mu 0 4 6 7 9 8
+		f 4 -12 -10 -8 -6
+		mu 0 4 1 10 11 3
+		f 4 10 4 6 8
+		mu 0 4 12 0 2 13;
+	setAttr ".cd" -type "dataPolyComponent" Index_Data Edge 0 ;
+	setAttr ".cvd" -type "dataPolyComponent" Index_Data Vertex 0 ;
+	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
+	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
+createNode pointConstraint -n "pCube2_pointConstraint1" -p "pCube2";
+	rename -uid "F0A4FDC4-45B7-8882-0224-519B9B8042F4";
+	addAttr -dcb 0 -ci true -k true -sn "w0" -ln "L_Arm_Roll_01W0" -dv 1 -min 0 -at "double";
+	setAttr -k on ".nds";
+	setAttr -k off ".v";
+	setAttr -k off ".tx";
+	setAttr -k off ".ty";
+	setAttr -k off ".tz";
+	setAttr -k off ".rx";
+	setAttr -k off ".ry";
+	setAttr -k off ".rz";
+	setAttr -k off ".sx";
+	setAttr -k off ".sy";
+	setAttr -k off ".sz";
+	setAttr ".erp" yes;
+	setAttr ".rst" -type "double3" 39.593900000000104 195.83500000000157 -13.745500000000026 ;
+	setAttr -k on ".w0";
+createNode orientConstraint -n "pCube2_orientConstraint1" -p "pCube2";
+	rename -uid "C546E6C0-4847-FA9F-BB72-79B4D2CB2737";
+	addAttr -dcb 0 -ci true -k true -sn "w0" -ln "L_Arm_Roll_01W0" -dv 1 -min 0 -at "double";
+	setAttr -k on ".nds";
+	setAttr -k off ".v";
+	setAttr -k off ".tx";
+	setAttr -k off ".ty";
+	setAttr -k off ".tz";
+	setAttr -k off ".rx";
+	setAttr -k off ".ry";
+	setAttr -k off ".rz";
+	setAttr -k off ".sx";
+	setAttr -k off ".sy";
+	setAttr -k off ".sz";
+	setAttr ".erp" yes;
+	setAttr ".lr" -type "double3" 0 3.1388555656179706 0 ;
+	setAttr ".rsrr" -type "double3" 0 3.1388555656179706 0 ;
 	setAttr -k on ".w0";
 createNode lightLinker -s -n "lightLinker1";
 	rename -uid "1BEF3239-42AC-9783-7187-578A5AD7A0B8";
@@ -15953,11 +16173,6 @@ createNode script -n "uiConfigurationScriptNode";
 		+ "\t\t\t\t\t\"modelPanel -edit -l (localizedPanelLabel(\\\"Persp View\\\")) -mbv $menusOkayInPanels  $panelName;\\n$editorName = $panelName;\\nmodelEditor -e \\n    -cam `findStartUpCamera persp` \\n    -useInteractiveMode 0\\n    -displayLights \\\"default\\\" \\n    -displayAppearance \\\"smoothShaded\\\" \\n    -activeOnly 0\\n    -ignorePanZoom 0\\n    -wireframeOnShaded 0\\n    -headsUpDisplay 1\\n    -holdOuts 1\\n    -selectionHiliteDisplay 1\\n    -useDefaultMaterial 0\\n    -bufferMode \\\"double\\\" \\n    -twoSidedLighting 0\\n    -backfaceCulling 0\\n    -xray 0\\n    -jointXray 1\\n    -activeComponentsXray 0\\n    -displayTextures 0\\n    -smoothWireframe 0\\n    -lineWidth 1\\n    -textureAnisotropic 0\\n    -textureHilight 1\\n    -textureSampling 2\\n    -textureDisplay \\\"modulate\\\" \\n    -textureMaxSize 16384\\n    -fogging 0\\n    -fogSource \\\"fragment\\\" \\n    -fogMode \\\"linear\\\" \\n    -fogStart 0\\n    -fogEnd 100\\n    -fogDensity 0.1\\n    -fogColor 0.5 0.5 0.5 1 \\n    -depthOfFieldPreview 1\\n    -maxConstantTransparency 1\\n    -rendererName \\\"vp2Renderer\\\" \\n    -objectFilterShowInHUD 1\\n    -isFiltered 0\\n    -colorResolution 256 256 \\n    -bumpResolution 512 512 \\n    -textureCompression 0\\n    -transparencyAlgorithm \\\"frontAndBackCull\\\" \\n    -transpInShadows 0\\n    -cullingOverride \\\"none\\\" \\n    -lowQualityLighting 0\\n    -maximumNumHardwareLights 1\\n    -occlusionCulling 0\\n    -shadingModel 0\\n    -useBaseRenderer 0\\n    -useReducedRenderer 0\\n    -smallObjectCulling 0\\n    -smallObjectThreshold -1 \\n    -interactiveDisableShadows 0\\n    -interactiveBackFaceCull 0\\n    -sortTransparent 1\\n    -nurbsCurves 1\\n    -nurbsSurfaces 1\\n    -polymeshes 1\\n    -subdivSurfaces 1\\n    -planes 1\\n    -lights 1\\n    -cameras 1\\n    -controlVertices 1\\n    -hulls 1\\n    -grid 1\\n    -imagePlane 1\\n    -joints 1\\n    -ikHandles 1\\n    -deformers 1\\n    -dynamics 1\\n    -particleInstancers 1\\n    -fluids 1\\n    -hairSystems 1\\n    -follicles 1\\n    -nCloths 1\\n    -nParticles 1\\n    -nRigids 1\\n    -dynamicConstraints 1\\n    -locators 1\\n    -manipulators 1\\n    -pluginShapes 1\\n    -dimensions 1\\n    -handles 1\\n    -pivots 1\\n    -textures 1\\n    -strokes 1\\n    -motionTrails 1\\n    -clipGhosts 1\\n    -greasePencils 1\\n    -shadows 0\\n    -captureSequenceNumber -1\\n    -width 1222\\n    -height 739\\n    -sceneRenderFilter 0\\n    $editorName;\\nmodelEditor -e -viewSelected 0 $editorName;\\nmodelEditor -e \\n    -pluginObjects \\\"gpuCacheDisplayFilter\\\" 1 \\n    $editorName\"\n"
 		+ "\t\t\t\t$configName;\n\n            setNamedPanelLayout (localizedPanelLabel(\"Current Layout\"));\n        }\n\n        panelHistory -e -clear mainPanelHistory;\n        sceneUIReplacement -clear;\n\t}\n\n\ngrid -spacing 100 -size 100 -divisions 4 -displayAxes yes -displayGridLines yes -displayDivisionLines yes -displayPerspectiveLabels no -displayOrthographicLabels no -displayAxesBold yes -perspectiveLabelPosition axis -orthographicLabelPosition edge;\nviewManip -drawCompass 0 -compassAngle 0 -frontParameters \"\" -homeParameters \"\" -selectionLockParameters \"\";\n}\n");
 	setAttr ".st" 3;
-createNode nodeGraphEditorInfo -n "MayaNodeEditorSavedTabsInfo";
-	rename -uid "4B731D4D-4E40-2686-4C9E-608192B111C3";
-	setAttr ".tgi[0].tn" -type "string" "Untitled_1";
-	setAttr ".tgi[0].vl" -type "double2" -529.04101021771953 -188.6957706150647 ;
-	setAttr ".tgi[0].vh" -type "double2" 345.44145758614695 249.39945007183331 ;
 createNode HIKCharacterNode -n "QuickRigCharacter";
 	rename -uid "64659ECF-4B02-27C0-23A6-E3ABAD035181";
 	addAttr -r false -ci true -sn "quickRigInfo" -ln "quickRigInfo" -at "compound" 
@@ -31597,6 +31812,64 @@ createNode dagPose -n "bindPose1";
 	setAttr ".bp" yes;
 createNode ikRPsolver -n "ikRPsolver";
 	rename -uid "9E42F595-424D-45FB-B514-7BA05C92F79F";
+createNode multiplyDivide -n "defDriver_arm_roll_twistMod_divide";
+	rename -uid "101C343A-469B-A33A-C1F6-CCA523444167";
+	setAttr ".i2" -type "float3" -0.1 1 1 ;
+createNode unitConversion -n "unitConversion1";
+	rename -uid "47F6EDE8-4408-8185-C60B-1BB40EFCCB89";
+	setAttr ".cf" 57.295779513082323;
+createNode unitConversion -n "unitConversion2";
+	rename -uid "B704D8FD-4621-23C6-24DF-B2B9B5ABC3A8";
+	setAttr ".cf" 0.017453292519943295;
+createNode multiplyDivide -n "defDriver_arm_roll_divide";
+	rename -uid "ADC7E624-431F-27BA-B50E-DFA8C9E3D228";
+	setAttr ".op" 2;
+	setAttr ".i2" -type "float3" 2 1 1 ;
+createNode unitConversion -n "unitConversion3";
+	rename -uid "9605E6CD-4A4A-3EF7-3C4E-88B65B6FF100";
+	setAttr ".cf" 57.295779513082323;
+createNode unitConversion -n "unitConversion4";
+	rename -uid "0A8BDD31-46CA-76C4-9773-BA8F47F6586E";
+	setAttr ".cf" 0.017453292519943295;
+createNode nodeGraphEditorInfo -n "MayaNodeEditorSavedTabsInfo";
+	rename -uid "ACA4EC6C-4F46-9304-2161-37B8D18295C2";
+	setAttr ".tgi[0].tn" -type "string" "Untitled_1";
+	setAttr ".tgi[0].vl" -type "double2" -597.44759121914933 -612.890145833681 ;
+	setAttr ".tgi[0].vh" -type "double2" 1325.8828536082592 366.9578223819633 ;
+	setAttr -s 11 ".tgi[0].ni";
+	setAttr ".tgi[0].ni[0].x" 1374.2857666015625;
+	setAttr ".tgi[0].ni[0].y" -110;
+	setAttr ".tgi[0].ni[0].nvs" 18304;
+	setAttr ".tgi[0].ni[1].x" -379.31182861328125;
+	setAttr ".tgi[0].ni[1].y" -152.92172241210937;
+	setAttr ".tgi[0].ni[1].nvs" 18304;
+	setAttr ".tgi[0].ni[2].x" 1374.2857666015625;
+	setAttr ".tgi[0].ni[2].y" -8.5714282989501953;
+	setAttr ".tgi[0].ni[2].nvs" 18304;
+	setAttr ".tgi[0].ni[3].x" -374.26107788085937;
+	setAttr ".tgi[0].ni[3].y" -330.29525756835937;
+	setAttr ".tgi[0].ni[3].nvs" 18304;
+	setAttr ".tgi[0].ni[4].x" 1710;
+	setAttr ".tgi[0].ni[4].y" -97.142860412597656;
+	setAttr ".tgi[0].ni[4].nvs" 18304;
+	setAttr ".tgi[0].ni[5].x" -43.49603271484375;
+	setAttr ".tgi[0].ni[5].y" 278.91595458984375;
+	setAttr ".tgi[0].ni[5].nvs" 18306;
+	setAttr ".tgi[0].ni[6].x" 1163.1072998046875;
+	setAttr ".tgi[0].ni[6].y" 263.01602172851562;
+	setAttr ".tgi[0].ni[6].nvs" 18305;
+	setAttr ".tgi[0].ni[7].x" 1374.2857666015625;
+	setAttr ".tgi[0].ni[7].y" -311.42855834960937;
+	setAttr ".tgi[0].ni[7].nvs" 18304;
+	setAttr ".tgi[0].ni[8].x" 727.14288330078125;
+	setAttr ".tgi[0].ni[8].y" 242.85714721679687;
+	setAttr ".tgi[0].ni[8].nvs" 18304;
+	setAttr ".tgi[0].ni[9].x" 829.16827392578125;
+	setAttr ".tgi[0].ni[9].y" 30.311792373657227;
+	setAttr ".tgi[0].ni[9].nvs" 18304;
+	setAttr ".tgi[0].ni[10].x" 420;
+	setAttr ".tgi[0].ni[10].y" 244.28572082519531;
+	setAttr ".tgi[0].ni[10].nvs" 18306;
 select -ne :time1;
 	setAttr -av -k on ".cch";
 	setAttr -av -k on ".ihi";
@@ -31642,6 +31915,8 @@ select -ne :postProcessList1;
 	setAttr -k on ".nds";
 	setAttr -cb on ".bnm";
 	setAttr -s 2 ".p";
+select -ne :defaultRenderUtilityList1;
+	setAttr -s 2 ".u";
 select -ne :defaultRenderingList1;
 	setAttr -k on ".ihi";
 	setAttr -s 2 ".r";
@@ -31652,6 +31927,7 @@ select -ne :initialShadingGroup;
 	setAttr -k on ".ihi";
 	setAttr -av -k on ".nds";
 	setAttr -cb on ".bnm";
+	setAttr -s 2 ".dsm";
 	setAttr -k on ".mwc";
 	setAttr -k on ".an";
 	setAttr -k on ".il";
@@ -31865,7 +32141,73 @@ connectAttr "L_Wrist.s" "L_Pinky_A.is";
 connectAttr "L_Pinky_A.s" "L_Pinky_B.is";
 connectAttr "L_Pinky_B.s" "L_Pinky_C.is";
 connectAttr "L_Shoulder.s" "L_Arm_Roll_01.is";
+connectAttr "L_Arm_Roll_01_pointConstraint1.ctx" "L_Arm_Roll_01.tx";
+connectAttr "L_Arm_Roll_01_pointConstraint1.cty" "L_Arm_Roll_01.ty";
+connectAttr "L_Arm_Roll_01_pointConstraint1.ctz" "L_Arm_Roll_01.tz";
+connectAttr "L_Arm_Roll_01_orientConstraint1.crx" "L_Arm_Roll_01.rx";
+connectAttr "L_Arm_Roll_01_orientConstraint1.cry" "L_Arm_Roll_01.ry";
+connectAttr "L_Arm_Roll_01_orientConstraint1.crz" "L_Arm_Roll_01.rz";
+connectAttr "L_Arm_Roll_01.pim" "L_Arm_Roll_01_pointConstraint1.cpim";
+connectAttr "L_Arm_Roll_01.rp" "L_Arm_Roll_01_pointConstraint1.crp";
+connectAttr "L_Arm_Roll_01.rpt" "L_Arm_Roll_01_pointConstraint1.crt";
+connectAttr "defDriver_l_arm_roll_01.t" "L_Arm_Roll_01_pointConstraint1.tg[0].tt"
+		;
+connectAttr "defDriver_l_arm_roll_01.rp" "L_Arm_Roll_01_pointConstraint1.tg[0].trp"
+		;
+connectAttr "defDriver_l_arm_roll_01.rpt" "L_Arm_Roll_01_pointConstraint1.tg[0].trt"
+		;
+connectAttr "defDriver_l_arm_roll_01.pm" "L_Arm_Roll_01_pointConstraint1.tg[0].tpm"
+		;
+connectAttr "L_Arm_Roll_01_pointConstraint1.w0" "L_Arm_Roll_01_pointConstraint1.tg[0].tw"
+		;
+connectAttr "L_Arm_Roll_01.ro" "L_Arm_Roll_01_orientConstraint1.cro";
+connectAttr "L_Arm_Roll_01.pim" "L_Arm_Roll_01_orientConstraint1.cpim";
+connectAttr "L_Arm_Roll_01.jo" "L_Arm_Roll_01_orientConstraint1.cjo";
+connectAttr "L_Arm_Roll_01.is" "L_Arm_Roll_01_orientConstraint1.is";
+connectAttr "defDriver_l_arm_roll_01.r" "L_Arm_Roll_01_orientConstraint1.tg[0].tr"
+		;
+connectAttr "defDriver_l_arm_roll_01.ro" "L_Arm_Roll_01_orientConstraint1.tg[0].tro"
+		;
+connectAttr "defDriver_l_arm_roll_01.pm" "L_Arm_Roll_01_orientConstraint1.tg[0].tpm"
+		;
+connectAttr "defDriver_l_arm_roll_01.jo" "L_Arm_Roll_01_orientConstraint1.tg[0].tjo"
+		;
+connectAttr "L_Arm_Roll_01_orientConstraint1.w0" "L_Arm_Roll_01_orientConstraint1.tg[0].tw"
+		;
 connectAttr "L_Shoulder.s" "L_Arm_Roll_02.is";
+connectAttr "L_Arm_Roll_02_pointConstraint1.ctx" "L_Arm_Roll_02.tx";
+connectAttr "L_Arm_Roll_02_pointConstraint1.cty" "L_Arm_Roll_02.ty";
+connectAttr "L_Arm_Roll_02_pointConstraint1.ctz" "L_Arm_Roll_02.tz";
+connectAttr "L_Arm_Roll_02_orientConstraint1.crx" "L_Arm_Roll_02.rx";
+connectAttr "L_Arm_Roll_02_orientConstraint1.cry" "L_Arm_Roll_02.ry";
+connectAttr "L_Arm_Roll_02_orientConstraint1.crz" "L_Arm_Roll_02.rz";
+connectAttr "L_Arm_Roll_02.pim" "L_Arm_Roll_02_pointConstraint1.cpim";
+connectAttr "L_Arm_Roll_02.rp" "L_Arm_Roll_02_pointConstraint1.crp";
+connectAttr "L_Arm_Roll_02.rpt" "L_Arm_Roll_02_pointConstraint1.crt";
+connectAttr "defDriver_l_arm_roll_02.t" "L_Arm_Roll_02_pointConstraint1.tg[0].tt"
+		;
+connectAttr "defDriver_l_arm_roll_02.rp" "L_Arm_Roll_02_pointConstraint1.tg[0].trp"
+		;
+connectAttr "defDriver_l_arm_roll_02.rpt" "L_Arm_Roll_02_pointConstraint1.tg[0].trt"
+		;
+connectAttr "defDriver_l_arm_roll_02.pm" "L_Arm_Roll_02_pointConstraint1.tg[0].tpm"
+		;
+connectAttr "L_Arm_Roll_02_pointConstraint1.w0" "L_Arm_Roll_02_pointConstraint1.tg[0].tw"
+		;
+connectAttr "L_Arm_Roll_02.ro" "L_Arm_Roll_02_orientConstraint1.cro";
+connectAttr "L_Arm_Roll_02.pim" "L_Arm_Roll_02_orientConstraint1.cpim";
+connectAttr "L_Arm_Roll_02.jo" "L_Arm_Roll_02_orientConstraint1.cjo";
+connectAttr "L_Arm_Roll_02.is" "L_Arm_Roll_02_orientConstraint1.is";
+connectAttr "defDriver_l_arm_roll_02.r" "L_Arm_Roll_02_orientConstraint1.tg[0].tr"
+		;
+connectAttr "defDriver_l_arm_roll_02.ro" "L_Arm_Roll_02_orientConstraint1.tg[0].tro"
+		;
+connectAttr "defDriver_l_arm_roll_02.pm" "L_Arm_Roll_02_orientConstraint1.tg[0].tpm"
+		;
+connectAttr "defDriver_l_arm_roll_02.jo" "L_Arm_Roll_02_orientConstraint1.tg[0].tjo"
+		;
+connectAttr "L_Arm_Roll_02_orientConstraint1.w0" "L_Arm_Roll_02_orientConstraint1.tg[0].tw"
+		;
 connectAttr "Chest.s" "R_Clavicle.is";
 connectAttr "R_Clavicle.s" "R_Shoulder.is";
 connectAttr "R_Shoulder.s" "R_Elbow.is";
@@ -31966,29 +32308,17 @@ connectAttr "l_arm_roll_vecDriverJoint.msg" "l_arm_roll_vecDriverJoint_ikhandle.
 		;
 connectAttr "effector1.hp" "l_arm_roll_vecDriverJoint_ikhandle.hee";
 connectAttr "ikRPsolver.msg" "l_arm_roll_vecDriverJoint_ikhandle.hsv";
-connectAttr "ikHandle1_pointConstraint1.ctx" "l_arm_roll_vecDriverJoint_ikhandle.tx"
+connectAttr "l_arm_roll_vecDriverJoint_ikhandle_pointConstraint1.ctx" "l_arm_roll_vecDriverJoint_ikhandle.tx"
 		;
-connectAttr "ikHandle1_pointConstraint1.cty" "l_arm_roll_vecDriverJoint_ikhandle.ty"
+connectAttr "l_arm_roll_vecDriverJoint_ikhandle_pointConstraint1.cty" "l_arm_roll_vecDriverJoint_ikhandle.ty"
 		;
-connectAttr "ikHandle1_pointConstraint1.ctz" "l_arm_roll_vecDriverJoint_ikhandle.tz"
+connectAttr "l_arm_roll_vecDriverJoint_ikhandle_pointConstraint1.ctz" "l_arm_roll_vecDriverJoint_ikhandle.tz"
 		;
 connectAttr "l_arm_roll_vecDriverJoint_ikhandle_poleVectorConstraint1.ctx" "l_arm_roll_vecDriverJoint_ikhandle.pvx"
 		;
 connectAttr "l_arm_roll_vecDriverJoint_ikhandle_poleVectorConstraint1.cty" "l_arm_roll_vecDriverJoint_ikhandle.pvy"
 		;
 connectAttr "l_arm_roll_vecDriverJoint_ikhandle_poleVectorConstraint1.ctz" "l_arm_roll_vecDriverJoint_ikhandle.pvz"
-		;
-connectAttr "l_arm_roll_vecDriverJoint_ikhandle.pim" "ikHandle1_pointConstraint1.cpim"
-		;
-connectAttr "l_arm_roll_vecDriverJoint_ikhandle.rp" "ikHandle1_pointConstraint1.crp"
-		;
-connectAttr "l_arm_roll_vecDriverJoint_ikhandle.rpt" "ikHandle1_pointConstraint1.crt"
-		;
-connectAttr "L_Elbow.t" "ikHandle1_pointConstraint1.tg[0].tt";
-connectAttr "L_Elbow.rp" "ikHandle1_pointConstraint1.tg[0].trp";
-connectAttr "L_Elbow.rpt" "ikHandle1_pointConstraint1.tg[0].trt";
-connectAttr "L_Elbow.pm" "ikHandle1_pointConstraint1.tg[0].tpm";
-connectAttr "ikHandle1_pointConstraint1.w0" "ikHandle1_pointConstraint1.tg[0].tw"
 		;
 connectAttr "l_arm_roll_vecDriverJoint_ikhandle.pim" "l_arm_roll_vecDriverJoint_ikhandle_poleVectorConstraint1.cpim"
 		;
@@ -32005,6 +32335,22 @@ connectAttr "l_arm_roll_vecDriverJoint_ikPV.rpt" "l_arm_roll_vecDriverJoint_ikha
 connectAttr "l_arm_roll_vecDriverJoint_ikPV.pm" "l_arm_roll_vecDriverJoint_ikhandle_poleVectorConstraint1.tg[0].tpm"
 		;
 connectAttr "l_arm_roll_vecDriverJoint_ikhandle_poleVectorConstraint1.w0" "l_arm_roll_vecDriverJoint_ikhandle_poleVectorConstraint1.tg[0].tw"
+		;
+connectAttr "l_arm_roll_vecDriverJoint_ikhandle.pim" "l_arm_roll_vecDriverJoint_ikhandle_pointConstraint1.cpim"
+		;
+connectAttr "l_arm_roll_vecDriverJoint_ikhandle.rp" "l_arm_roll_vecDriverJoint_ikhandle_pointConstraint1.crp"
+		;
+connectAttr "l_arm_roll_vecDriverJoint_ikhandle.rpt" "l_arm_roll_vecDriverJoint_ikhandle_pointConstraint1.crt"
+		;
+connectAttr "L_Elbow.t" "l_arm_roll_vecDriverJoint_ikhandle_pointConstraint1.tg[0].tt"
+		;
+connectAttr "L_Elbow.rp" "l_arm_roll_vecDriverJoint_ikhandle_pointConstraint1.tg[0].trp"
+		;
+connectAttr "L_Elbow.rpt" "l_arm_roll_vecDriverJoint_ikhandle_pointConstraint1.tg[0].trt"
+		;
+connectAttr "L_Elbow.pm" "l_arm_roll_vecDriverJoint_ikhandle_pointConstraint1.tg[0].tpm"
+		;
+connectAttr "l_arm_roll_vecDriverJoint_ikhandle_pointConstraint1.w0" "l_arm_roll_vecDriverJoint_ikhandle_pointConstraint1.tg[0].tw"
 		;
 connectAttr "defDriver_l_arm_roll_grp_parentConstraint1.ctx" "defDriver_l_arm_roll_grp.tx"
 		;
@@ -32054,6 +32400,7 @@ connectAttr "defDriver_l_arm_roll_02_pointConstraint1.cty" "defDriver_l_arm_roll
 		;
 connectAttr "defDriver_l_arm_roll_02_pointConstraint1.ctz" "defDriver_l_arm_roll_02.tz"
 		;
+connectAttr "unitConversion4.o" "defDriver_l_arm_roll_02.ry";
 connectAttr "defDriver_l_arm_roll_02.pim" "defDriver_l_arm_roll_02_pointConstraint1.cpim"
 		;
 connectAttr "defDriver_l_arm_roll_02.rp" "defDriver_l_arm_roll_02_pointConstraint1.crp"
@@ -32082,6 +32429,7 @@ connectAttr "defDriver_l_arm_roll_01_aimConstraint1.cry" "defDriver_l_arm_roll_0
 connectAttr "defDriver_l_arm_roll_01_aimConstraint1.crz" "defDriver_l_arm_roll_01.rz"
 		;
 connectAttr "defDriver_l_arm_roll_01.s" "defDriver_l_arm_roll_twistMod.is";
+connectAttr "unitConversion2.o" "defDriver_l_arm_roll_twistMod.ry";
 connectAttr "defDriver_l_arm_roll_01.pim" "defDriver_l_arm_roll_01_aimConstraint1.cpim"
 		;
 connectAttr "defDriver_l_arm_roll_01.t" "defDriver_l_arm_roll_01_aimConstraint1.ct"
@@ -32104,6 +32452,48 @@ connectAttr "defDriver_l_arm_roll_01_aimConstraint1.w0" "defDriver_l_arm_roll_01
 		;
 connectAttr "defDriver_l_arm_roll_01_aimUp.wm" "defDriver_l_arm_roll_01_aimConstraint1.wum"
 		;
+connectAttr "pCube1_pointConstraint1.ctx" "pCube1.tx";
+connectAttr "pCube1_pointConstraint1.cty" "pCube1.ty";
+connectAttr "pCube1_pointConstraint1.ctz" "pCube1.tz";
+connectAttr "pCube1_orientConstraint1.crx" "pCube1.rx";
+connectAttr "pCube1_orientConstraint1.cry" "pCube1.ry";
+connectAttr "pCube1_orientConstraint1.crz" "pCube1.rz";
+connectAttr "pCube1.pim" "pCube1_pointConstraint1.cpim";
+connectAttr "pCube1.rp" "pCube1_pointConstraint1.crp";
+connectAttr "pCube1.rpt" "pCube1_pointConstraint1.crt";
+connectAttr "L_Arm_Roll_02.t" "pCube1_pointConstraint1.tg[0].tt";
+connectAttr "L_Arm_Roll_02.rp" "pCube1_pointConstraint1.tg[0].trp";
+connectAttr "L_Arm_Roll_02.rpt" "pCube1_pointConstraint1.tg[0].trt";
+connectAttr "L_Arm_Roll_02.pm" "pCube1_pointConstraint1.tg[0].tpm";
+connectAttr "pCube1_pointConstraint1.w0" "pCube1_pointConstraint1.tg[0].tw";
+connectAttr "pCube1.ro" "pCube1_orientConstraint1.cro";
+connectAttr "pCube1.pim" "pCube1_orientConstraint1.cpim";
+connectAttr "L_Arm_Roll_02.r" "pCube1_orientConstraint1.tg[0].tr";
+connectAttr "L_Arm_Roll_02.ro" "pCube1_orientConstraint1.tg[0].tro";
+connectAttr "L_Arm_Roll_02.pm" "pCube1_orientConstraint1.tg[0].tpm";
+connectAttr "L_Arm_Roll_02.jo" "pCube1_orientConstraint1.tg[0].tjo";
+connectAttr "pCube1_orientConstraint1.w0" "pCube1_orientConstraint1.tg[0].tw";
+connectAttr "pCube2_pointConstraint1.ctx" "pCube2.tx";
+connectAttr "pCube2_pointConstraint1.cty" "pCube2.ty";
+connectAttr "pCube2_pointConstraint1.ctz" "pCube2.tz";
+connectAttr "pCube2_orientConstraint1.crx" "pCube2.rx";
+connectAttr "pCube2_orientConstraint1.cry" "pCube2.ry";
+connectAttr "pCube2_orientConstraint1.crz" "pCube2.rz";
+connectAttr "pCube2.pim" "pCube2_pointConstraint1.cpim";
+connectAttr "pCube2.rp" "pCube2_pointConstraint1.crp";
+connectAttr "pCube2.rpt" "pCube2_pointConstraint1.crt";
+connectAttr "L_Arm_Roll_01.t" "pCube2_pointConstraint1.tg[0].tt";
+connectAttr "L_Arm_Roll_01.rp" "pCube2_pointConstraint1.tg[0].trp";
+connectAttr "L_Arm_Roll_01.rpt" "pCube2_pointConstraint1.tg[0].trt";
+connectAttr "L_Arm_Roll_01.pm" "pCube2_pointConstraint1.tg[0].tpm";
+connectAttr "pCube2_pointConstraint1.w0" "pCube2_pointConstraint1.tg[0].tw";
+connectAttr "pCube2.ro" "pCube2_orientConstraint1.cro";
+connectAttr "pCube2.pim" "pCube2_orientConstraint1.cpim";
+connectAttr "L_Arm_Roll_01.r" "pCube2_orientConstraint1.tg[0].tr";
+connectAttr "L_Arm_Roll_01.ro" "pCube2_orientConstraint1.tg[0].tro";
+connectAttr "L_Arm_Roll_01.pm" "pCube2_orientConstraint1.tg[0].tpm";
+connectAttr "L_Arm_Roll_01.jo" "pCube2_orientConstraint1.tg[0].tjo";
+connectAttr "pCube2_orientConstraint1.w0" "pCube2_orientConstraint1.tg[0].tw";
 relationship "link" ":lightLinker1" ":initialShadingGroup.message" ":defaultLightSet.message";
 relationship "link" ":lightLinker1" ":initialParticleSE.message" ":defaultLightSet.message";
 relationship "link" ":lightLinker1" "Box006SG1.message" ":defaultLightSet.message";
@@ -32516,10 +32906,39 @@ connectAttr "R_Knee.bps" "bindPose1.wm[52]";
 connectAttr "R_Ankle.bps" "bindPose1.wm[53]";
 connectAttr "R_Ball.bps" "bindPose1.wm[54]";
 connectAttr "R_Toe.bps" "bindPose1.wm[55]";
+connectAttr "unitConversion1.o" "defDriver_arm_roll_twistMod_divide.i1x";
+connectAttr "defDriver_l_arm_roll_01.ry" "unitConversion1.i";
+connectAttr "defDriver_arm_roll_twistMod_divide.ox" "unitConversion2.i";
+connectAttr "unitConversion3.o" "defDriver_arm_roll_divide.i1x";
+connectAttr "defDriver_l_arm_roll_01.ry" "unitConversion3.i";
+connectAttr "defDriver_arm_roll_divide.ox" "unitConversion4.i";
+connectAttr "pCube2_pointConstraint1.msg" "MayaNodeEditorSavedTabsInfo.tgi[0].ni[0].dn"
+		;
+connectAttr "L_Elbow.msg" "MayaNodeEditorSavedTabsInfo.tgi[0].ni[1].dn";
+connectAttr "pCube2_orientConstraint1.msg" "MayaNodeEditorSavedTabsInfo.tgi[0].ni[2].dn"
+		;
+connectAttr "defDriver_l_arm_roll_01_aimUp.msg" "MayaNodeEditorSavedTabsInfo.tgi[0].ni[3].dn"
+		;
+connectAttr "pCube2.msg" "MayaNodeEditorSavedTabsInfo.tgi[0].ni[4].dn";
+connectAttr "defDriver_l_arm_roll_01_aimConstraint1.msg" "MayaNodeEditorSavedTabsInfo.tgi[0].ni[5].dn"
+		;
+connectAttr "L_Arm_Roll_01.msg" "MayaNodeEditorSavedTabsInfo.tgi[0].ni[6].dn";
+connectAttr "L_Arm_Roll_01_pointConstraint1.msg" "MayaNodeEditorSavedTabsInfo.tgi[0].ni[7].dn"
+		;
+connectAttr "L_Shoulder.msg" "MayaNodeEditorSavedTabsInfo.tgi[0].ni[8].dn";
+connectAttr "L_Arm_Roll_01_orientConstraint1.msg" "MayaNodeEditorSavedTabsInfo.tgi[0].ni[9].dn"
+		;
+connectAttr "defDriver_l_arm_roll_01.msg" "MayaNodeEditorSavedTabsInfo.tgi[0].ni[10].dn"
+		;
 connectAttr "Box006SG1.pa" ":renderPartition.st" -na;
 connectAttr "blinn1SG.pa" ":renderPartition.st" -na;
 connectAttr "blinn1.msg" ":defaultShaderList1.s" -na;
+connectAttr "defDriver_arm_roll_twistMod_divide.msg" ":defaultRenderUtilityList1.u"
+		 -na;
+connectAttr "defDriver_arm_roll_divide.msg" ":defaultRenderUtilityList1.u" -na;
 connectAttr "defaultRenderLayer.msg" ":defaultRenderingList1.r" -na;
 connectAttr "pasted__defaultRenderLayer.msg" ":defaultRenderingList1.r" -na;
+connectAttr "pCubeShape1.iog" ":initialShadingGroup.dsm" -na;
+connectAttr "pCubeShape2.iog" ":initialShadingGroup.dsm" -na;
 connectAttr "ikRPsolver.msg" ":ikSystem.sol" -na;
 // End of RollJoints.ma
