@@ -421,14 +421,17 @@ def build_main(ctrl_size=15, net=None):
 
 def build_space_switching(main_net):
 
-    def make_space_grp(ctrl, orient=False, point=True, name='Space'):
-        space_grp = pymel.group(empty=True, name=naming_utils.concatenate([ctrl.name(), name]))
-        naming_utils.add_tags(space_grp, {'Network': ctrl.network})
+    def make_space_grp(ctrl, orient=False, point=True, name='Space', parent=True):
+
+        space_grp = virtual_classes.TransformNode(name=naming_utils.concatenate([ctrl.name(), name]))
+        naming_utils.add_tags(space_grp, {'Network': ctrl.network.name()})
         space_grp.setTranslation(ctrl.getTranslation(worldSpace=True), worldSpace=True)
         if point:
             pymel.pointConstraint([ctrl, space_grp], maintainOffset=False)
         if orient:
             pymel.orientConstraint([ctrl, space_grp], maintainOffset=True)
+        if parent:
+            space_grp.setParent(space_grp.limb_grp)
 
         return space_grp
 
@@ -440,7 +443,10 @@ def build_space_switching(main_net):
 
         ctrl.addAttr('Space', attributeType='enum', enumName=enums, keyable=True)
 
+        info = naming_utils.ItemInfo(ctrl.name())
+
         space_switch_grp = pymel.group(empty=True, name=naming_utils.concatenate([ctrl.name(), name]))
+        naming_utils.add_tags(space_switch_grp, {'Network': ctrl.network.name()})
 
         if con_type == 'orient':
             space_con = pymel.orientConstraint(targets + [space_switch_grp])
@@ -453,12 +459,13 @@ def build_space_switching(main_net):
             return
 
         for idx, obj in enumerate(targets):
-            space_condition = general_utils.make_condition(secondTerm=idx, net=main_net, name=naming_utils.concatenate([ctrl.name(), name, 'CON']))
+            space_condition = general_utils.make_condition(secondTerm=idx, net=main_net, name=naming_utils.concatenate([info.base_name, info.joint_name, info.index, name, 'CON']))
+            naming_utils.add_tags(space_condition, {'Network': ctrl.network.name()})
             ctrl.Space.connect(space_condition.firstTerm)
             attr = '{}{}{}'.format(space_con, '.w', idx)
             space_condition.outColorR.connect(attr)
 
-        space_switch_grp.setParent(main_net.main_ctrl[0])
+        space_switch_grp.setParent(ctrl.limb_grp)
         return space_switch_grp
 
     chest_ctrl_space = make_space_grp(main_net.spine[0].ik_ctrls[-1], orient=True)
@@ -466,25 +473,27 @@ def build_space_switching(main_net):
     neck_ctrl_space = make_space_grp(main_net.head[0].fk_ctrls[0], orient=True)
     head_ctrl_space = make_space_grp(main_net.head[0].fk_ctrls[1], orient=True)
     main_ctrl_space = make_space_grp(main_net.main_ctrl[0], orient=True)
+    main_ctrl_space.setParent(main_net.main_ctrl[0])
 
     # Neck Space Switch
     neck_space_switch = make_space_switch(main_net.head[0].fk_ctrls[0], targets=[chest_ctrl_space, main_ctrl_space])
     head_space_switch = make_space_switch(main_net.head[0].fk_ctrls[1], targets=[neck_ctrl_space, main_ctrl_space])
     pymel.parentConstraint([main_net.spine[0].ik_ctrls[-1], main_net.head[0].fk_ctrls[0].getParent()], maintainOffset=True, skipRotate=('x', 'y', 'z'))
 
-
     # Clavicle - Arms
     for index, clavicle in enumerate(main_net.clavicles):
 
         clavicle_ctrl_space = make_space_grp(clavicle.fk_ctrls[0], orient=True)
 
-        fk_arm_space_switch = make_space_switch(main_net.arms[index].fk_ctrls[0], targets=[clavicle_ctrl_space, main_ctrl_space, head_ctrl_space, pelvis_ctrl_space])
-        clavicle_space_switch = make_space_switch(clavicle.fk_ctrls[0], targets=[chest_ctrl_space, main_ctrl_space, head_ctrl_space, pelvis_ctrl_space])
+        fk_arm_switch = make_space_switch(main_net.arms[index].fk_ctrls[0], targets=[clavicle_ctrl_space, main_ctrl_space, head_ctrl_space, pelvis_ctrl_space])
+        clavicle_switch = make_space_switch(clavicle.fk_ctrls[0], targets=[chest_ctrl_space, main_ctrl_space, head_ctrl_space, pelvis_ctrl_space])
 
-        ik_ctrl_space_switch = make_space_switch(main_net.arms[index].ik_ctrls[0], targets=[main_ctrl_space, clavicle_ctrl_space, head_ctrl_space, pelvis_ctrl_space], con_type='parent')
-        pole_ctrl_space_switch = make_space_switch(main_net.arms[index].pole_ctrls[0], targets=[main_ctrl_space, clavicle_ctrl_space, head_ctrl_space, pelvis_ctrl_space], con_type='parent')
+        ik_arm_switch = make_space_switch(main_net.arms[index].ik_ctrls[0], targets=[main_ctrl_space, clavicle_ctrl_space, head_ctrl_space, pelvis_ctrl_space], con_type='parent')
+        arm_pole_switch = make_space_switch(main_net.arms[index].pole_ctrls[0], targets=[main_ctrl_space, clavicle_ctrl_space, head_ctrl_space, pelvis_ctrl_space], con_type='parent')
 
         leg_ctrl_space_switch = make_space_switch(main_net.legs[index].fk_ctrls[0], targets=[main_ctrl_space, pelvis_ctrl_space])
+        ik_leg_switch = make_space_switch(main_net.legs[index].ik_ctrls[0], targets=[main_ctrl_space, pelvis_ctrl_space], con_type='parent')
+        leg_pole_switch = make_space_switch(main_net.legs[index].pole_ctrls[0], targets=[main_ctrl_space, pelvis_ctrl_space], con_type='parent')
 
 
         # Parent Constraint FK IK Root
@@ -500,6 +509,11 @@ def build_space_switching(main_net):
         pymel.parentConstraint([main_net.spine[0].ik_ctrls[0], main_net.legs[index].fk_ctrls[0].getParent()], maintainOffset=True, skipRotate=('x', 'y', 'z'))
         pymel.parentConstraint([main_net.spine[0].ik_ctrls[0], main_net.legs[index].ik_jnts[0]], maintainOffset=True, skipRotate=('x', 'y', 'z'))
 
+    # Parent Space Groups
+    # chest_ctrl_space.setParent(chest_ctrl_space.limb_grp)
+    # pelvis_ctrl_space.setParent(pelvis_ctrl_space.limb_grp)
+
+
 
 def group_limb(net):
     # LimbGRP
@@ -508,7 +522,7 @@ def group_limb(net):
     limb_grp.rotateOrder.set(net.jnts[0].rotateOrder.get())
     limb_grp.setMatrix(net.jnts[0].getMatrix(worldSpace=True), worldSpace=True)
     limb_grp = virtual_classes.attach_class(limb_grp, net)
-    naming_utils.add_tags(limb_grp, {'Network': net.name()})
+    naming_utils.add_tags(limb_grp, {'Network': net.name(), 'Utility': 'LimbGrp'})
 
     # Group Ctrl Rig
     log.info('Grouping CTRLS')

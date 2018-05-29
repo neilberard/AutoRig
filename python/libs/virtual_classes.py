@@ -59,6 +59,8 @@ class BaseNode():
                 if object.hasAttr('_class'):
                     return object
 
+        elif self.hasAttr('Network'):
+            return pymel.PyNode(self.Network.get())
 
     @property
     def main(self):
@@ -139,6 +141,13 @@ class BaseNode():
     @property
     def region(self):
         return self.network.Region.get()
+
+    @property
+    def limb_grp(self):
+        for obj in pymel.ls():
+            if obj.hasAttr('Network') and obj.Network.get() == self.network.name() and obj.hasAttr(
+                    'Utility') and obj.Utility.get() == 'LimbGrp':
+                return obj
 
     def add_network_tag(self):
         self.add_tags({'Network': self.network.name()})
