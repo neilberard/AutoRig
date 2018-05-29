@@ -4,6 +4,7 @@ from PySide2 import QtCore, QtWidgets
 from python.qt.Qt import loadUiType
 from shiboken2 import wrapInstance
 import maya.OpenMayaUI as omui
+import maya.OpenMaya as OpenMaya
 import os
 import logging
 import pymel.core as pymel
@@ -40,7 +41,19 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
 
         log.info(self.__class__.__name__)
         self.setupUi(self)
-        self.pb_main.hide()
+        self.events = []
+        self.pb_main.hide()  # Hide Progress Bar
+        self.setup_callbacks()  # Add Callbacks
+
+    def setup_callbacks(self):
+        self.remove_callbacks()
+        self.events = [
+            OpenMaya.MEventMessage.addEventCallback('SelectionChanged', self.update_cb_ctrl_space)
+        ]
+    def remove_callbacks(self):
+        for callback in self.events:
+            OpenMaya.MEventMessage.removeCallback(callback)
+
 
     # @QtCore.Slot(): Decorator based on widget name that connects QT signal.
     @QtCore.Slot()
@@ -79,10 +92,12 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     @QtCore.Slot()
     def on_btn_build_humanoid_clicked(self):
         log.info('on_btn_build_humanoid_clicked')
+        self.remove_callbacks()
         self.progress_bar = QtWidgets.QProgressBar(self)
         self.pb_main.setValue(0)
         self.pb_main.show()
         build_rig.build_humanoid_rig(self.pb_main, mirror=False)
+        self.setup_callbacks()
 
     @QtCore.Slot()
     def on_btn_delete_all_ctrls_clicked(self):
@@ -114,6 +129,18 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
         log.info('btn_select_all_ctrls')
         pose_utils.select_all_ctrls()
 
+    def update_cb_ctrl_space(self, *args, **kwargs):
+        self.cb_space.clear()
+
+        if pymel.selected():
+            sel = pymel.selected()[-1]
+            if sel.hasAttr('Space'):
+                self.cb_space.addItems(sel.Space.getEnums().keys())
+
+
+    @QtCore.Slot()
+    def closeEvent(self, *args):
+        self.remove_callbacks()
 
 def showUI():
     for widget in QtWidgets.QApplication.allWidgets():
