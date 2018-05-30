@@ -129,13 +129,46 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
         log.info('btn_select_all_ctrls')
         pose_utils.select_all_ctrls()
 
+    @QtCore.Slot()
+    def on_cb_space_currentIndexChanged(self):
+        if pymel.selected():
+            sel = pymel.selected()
+            print self.cb_space.currentIndex()
+
+            matrices = [x.getMatrix(worldSpace=True) for x in sel]
+
+            for obj in sel:
+                try:
+                    obj.Space.set(self.cb_space.currentIndex())
+                except:
+                    pass
+
+            for idx, obj in enumerate(sel):
+
+                try:
+                    obj.setMatrix(matrices[idx], worldSpace=True)
+                except:
+                    pass
+
+
+
+        print 'Changed!'
+
     def update_cb_ctrl_space(self, *args, **kwargs):
+        self.cb_space.blockSignals(True)
+
         self.cb_space.clear()
 
-        if pymel.selected():
-            sel = pymel.selected()[-1]
-            if sel.hasAttr('Space'):
-                self.cb_space.addItems(sel.Space.getEnums().keys())
+        sel = pymel.selected()
+
+        if sel:
+            main_sel = sel[-1]
+            if main_sel.hasAttr('Space'):
+                self.cb_space.addItems(main_sel.Space.getEnums().keys())
+                index = self.cb_space.findText(main_sel.Space.get(asString=True), QtCore.Qt.MatchFixedString)
+                self.cb_space.setCurrentIndex(index)
+
+        self.cb_space.blockSignals(False)
 
 
     @QtCore.Slot()

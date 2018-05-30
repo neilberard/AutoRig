@@ -484,6 +484,7 @@ def build_space_switching(main_net):
     for index, clavicle in enumerate(main_net.clavicles):
 
         clavicle_ctrl_space = make_space_grp(clavicle.fk_ctrls[0], orient=True)
+        foot_ctrl_space = make_space_grp(main_net.legs[index].ik_ctrls[0], orient=True)
 
         fk_arm_switch = make_space_switch(main_net.arms[index].fk_ctrls[0], targets=[clavicle_ctrl_space, main_ctrl_space, head_ctrl_space, pelvis_ctrl_space])
         clavicle_switch = make_space_switch(clavicle.fk_ctrls[0], targets=[chest_ctrl_space, main_ctrl_space, head_ctrl_space, pelvis_ctrl_space])
@@ -493,8 +494,7 @@ def build_space_switching(main_net):
 
         leg_ctrl_space_switch = make_space_switch(main_net.legs[index].fk_ctrls[0], targets=[main_ctrl_space, pelvis_ctrl_space])
         ik_leg_switch = make_space_switch(main_net.legs[index].ik_ctrls[0], targets=[main_ctrl_space, pelvis_ctrl_space], con_type='parent')
-        leg_pole_switch = make_space_switch(main_net.legs[index].pole_ctrls[0], targets=[main_ctrl_space, pelvis_ctrl_space], con_type='parent')
-
+        leg_pole_switch = make_space_switch(main_net.legs[index].pole_ctrls[0], targets=[main_ctrl_space, pelvis_ctrl_space, foot_ctrl_space], con_type='parent')
 
         # Parent Constraint FK IK Root
 
