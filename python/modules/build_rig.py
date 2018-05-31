@@ -553,8 +553,9 @@ def build_roll_jnts(main_net, roll_jnt_count=3):
             weight_b = increment * roll_idx
             weight_a = 1 - weight_b
 
-            new_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', consts.INDEX[roll_idx]])
-            dup_jnt = pymel.duplicate(jnt_a, name=new_name)[0]
+            name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', consts.INDEX[roll_idx]])
+            dup_jnt = pymel.duplicate(jnt_a, name=name)[0]
+            dup_jnt.radius.set(15)
             pymel.delete(dup_jnt.getChildren())
             dup_jnt.setParent(jnt_a)
             naming_utils.add_tags(dup_jnt, {'Network': net.name(), 'Utility': 'Roll'})
@@ -563,13 +564,32 @@ def build_roll_jnts(main_net, roll_jnt_count=3):
             point_con.w0.set(weight_a)
             point_con.w1.set(weight_b)
 
+            # Multi Node
+            name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Multi', consts.INDEX[roll_idx]])
+            multi_utility = pymel.shadingNode('multiplyDivide', name=name, asUtility=True)
+            naming_utils.add_tags(multi_utility, {'Network': net.name(), 'Utility': 'Roll'})
+
+            jnt_a.rotateX.connect(multi_utility.input1X)
+            multi_utility.input2X.set(-weight_a)
+            multi_utility.outputX.connect(dup_jnt.rotateX)
+
+
+
+
     def create_driver_rig(jnt_a, jnt_b, net):
 
         info = naming_utils.ItemInfo(jnt_a)
 
+        # Driver Group
         grp_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', 'GRP'])
         grp = virtual_classes.TransformNode(name=grp_name)
         naming_utils.add_tags(grp, {'Network': net.name()})
+        pymel.parentConstraint([jnt_a, grp])
+
+        try:
+            grp.setParent(grp.limb_grp)
+        except:
+            print 'failed'
 
 
         # Driver A
@@ -587,20 +607,18 @@ def build_roll_jnts(main_net, roll_jnt_count=3):
 
         ikhandle_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', 'IK'])
         ikhandle = pymel.ikHandle(startJoint=driver_a, endEffector=driver_b, name=ikhandle_name, solver='ikSCsolver')[0]
-        print type(ikhandle)
         ikhandle.setParent(grp)
         pymel.parentConstraint([jnt_a.getParent(), ikhandle], maintainOffset=True)
 
         return grp
-
 
     for idx in range(2):
         # Add Upper Arm Roll
         create_joints(main_net.arms[idx].jnts[0], main_net.arms[idx].jnts[1], main_net.arms[idx])
         create_joints(main_net.arms[idx].jnts[1], main_net.arms[idx].jnts[2], main_net.arms[idx])
 
-        create_joints(main_net.legs[idx].jnts[0], main_net.legs[idx].jnts[1], main_net.arms[idx])
-        create_joints(main_net.legs[idx].jnts[1], main_net.legs[idx].jnts[2], main_net.arms[idx])
+        create_joints(main_net.legs[idx].jnts[0], main_net.legs[idx].jnts[1], main_net.legs[idx])
+        create_joints(main_net.legs[idx].jnts[1], main_net.legs[idx].jnts[2], main_net.legs[idx])
 
 
 
