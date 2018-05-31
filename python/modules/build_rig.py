@@ -4,7 +4,7 @@ import pymel.core as pymel
 from python.libs import build_ctrls
 from python.libs import general_utils
 from python.libs import joint_utils
-from python.libs import lib_network, naming_utils, virtual_classes
+from python.libs import lib_network, naming_utils, virtual_classes, consts
 
 reload(lib_network)
 reload(build_ctrls)
@@ -12,6 +12,7 @@ reload(joint_utils)
 reload(naming_utils)
 reload(general_utils)
 reload(virtual_classes)
+reload(consts)
 
 import logging
 log = logging.getLogger(__name__)
@@ -32,6 +33,25 @@ def delete_rig():
     for jnt in pymel.ls():
         if jnt.hasAttr('_class'):
             jnt.deleteAttr('_class')
+
+
+def group_limb(net):
+    # LimbGRP
+    limb_grp_name = naming_utils.concatenate([net.side, net.region, 'GRP'])
+    limb_grp = pymel.group(empty=True, name=limb_grp_name)
+    limb_grp.rotateOrder.set(net.jnts[0].rotateOrder.get())
+    limb_grp.setMatrix(net.jnts[0].getMatrix(worldSpace=True), worldSpace=True)
+    limb_grp = virtual_classes.attach_class(limb_grp, net)
+    naming_utils.add_tags(limb_grp, {'Network': net.name(), 'Utility': 'LimbGrp'})
+
+    # Group Ctrl Rig
+    log.info('Grouping CTRLS')
+    for node in net.getCtrlRig():
+        root = joint_utils.get_root(node)
+        if root and root != limb_grp and root not in net.jnts and root != 'JNT':  # Todo: Simplify this logic
+            root.setParent(limb_grp)
+
+    return limb_grp
 
 
 def build_ikfk_limb(jnts, net=None, fk_size=2.0, fk_shape='Circle', ik_size=1.0, ik_shape='Cube01', pole_size=1.0, pole_shape='Cube01', ikfk_size=1.0, ikfk_shape='IKFK', region='', side=''):
@@ -405,7 +425,7 @@ def build_head(jnts, net=None):
             pymel.parentConstraint([head_ctrl, jnt])
 
         elif info.joint_name == 'Neck':
-            neck_ctrl = build_ctrls.create_ctrl(jnt, size=2, attr=net.FK_CTRLS, network=net)
+            neck_ctrl = build_ctrls.create_ctrl(jnt, name=naming_utils.concatenate([info.joint_name, 'CTRL']), size=2, attr=net.FK_CTRLS, network=net)
             pymel.parentConstraint([neck_ctrl, jnt])
 
     head_ctrl.setParent(neck_ctrl)
@@ -420,6 +440,7 @@ def build_main(ctrl_size=15, net=None):
 
 
 def build_space_switching(main_net):
+    """Connect Limbs with space switching"""
 
     def make_space_grp(ctrl, orient=False, point=True, name='Space', parent=True):
 
@@ -476,62 +497,112 @@ def build_space_switching(main_net):
     main_ctrl_space.setParent(main_net.main_ctrl[0])
 
     # Neck Space Switch
-    neck_space_switch = make_space_switch(main_net.head[0].fk_ctrls[0], targets=[chest_ctrl_space, main_ctrl_space])
+    make_space_switch(main_net.head[0].fk_ctrls[0], targets=[chest_ctrl_space, main_ctrl_space])
+    # Head Space Switch
     head_space_switch = make_space_switch(main_net.head[0].fk_ctrls[1], targets=[neck_ctrl_space, main_ctrl_space])
+
+    # Parent Constraint Head Limb to Torso
     pymel.parentConstraint([main_net.spine[0].ik_ctrls[-1], main_net.head[0].fk_ctrls[0].getParent()], maintainOffset=True, skipRotate=('x', 'y', 'z'))
 
-    # Clavicle - Arms
+    # Space Switch for Arms and Legs
     for index, clavicle in enumerate(main_net.clavicles):
 
         clavicle_ctrl_space = make_space_grp(clavicle.fk_ctrls[0], orient=True)
         foot_ctrl_space = make_space_grp(main_net.legs[index].ik_ctrls[0], orient=True)
 
-        fk_arm_switch = make_space_switch(main_net.arms[index].fk_ctrls[0], targets=[clavicle_ctrl_space, main_ctrl_space, head_ctrl_space, pelvis_ctrl_space])
-        clavicle_switch = make_space_switch(clavicle.fk_ctrls[0], targets=[chest_ctrl_space, main_ctrl_space, head_ctrl_space, pelvis_ctrl_space])
+        # FK ARM Switch
+        make_space_switch(main_net.arms[index].fk_ctrls[0], targets=[clavicle_ctrl_space, main_ctrl_space, head_ctrl_space, pelvis_ctrl_space])
+        # Clavicle Switch
+        make_space_switch(clavicle.fk_ctrls[0], targets=[chest_ctrl_space, main_ctrl_space, head_ctrl_space, pelvis_ctrl_space])
+        # IK Arm Switch
+        make_space_switch(main_net.arms[index].ik_ctrls[0], targets=[main_ctrl_space, clavicle_ctrl_space, head_ctrl_space, pelvis_ctrl_space], con_type='parent')
+        # Arm Pole Switch
+        make_space_switch(main_net.arms[index].pole_ctrls[0], targets=[main_ctrl_space, clavicle_ctrl_space, head_ctrl_space, pelvis_ctrl_space], con_type='parent')
+        # FK Leg Switch
+        make_space_switch(main_net.legs[index].fk_ctrls[0], targets=[main_ctrl_space, pelvis_ctrl_space])
+        # IK Leg Switch
+        make_space_switch(main_net.legs[index].ik_ctrls[0], targets=[main_ctrl_space, pelvis_ctrl_space], con_type='parent')
+        # IK Leg Pole Switch
+        make_space_switch(main_net.legs[index].pole_ctrls[0], targets=[main_ctrl_space, pelvis_ctrl_space, foot_ctrl_space], con_type='parent')
 
-        ik_arm_switch = make_space_switch(main_net.arms[index].ik_ctrls[0], targets=[main_ctrl_space, clavicle_ctrl_space, head_ctrl_space, pelvis_ctrl_space], con_type='parent')
-        arm_pole_switch = make_space_switch(main_net.arms[index].pole_ctrls[0], targets=[main_ctrl_space, clavicle_ctrl_space, head_ctrl_space, pelvis_ctrl_space], con_type='parent')
-
-        leg_ctrl_space_switch = make_space_switch(main_net.legs[index].fk_ctrls[0], targets=[main_ctrl_space, pelvis_ctrl_space])
-        ik_leg_switch = make_space_switch(main_net.legs[index].ik_ctrls[0], targets=[main_ctrl_space, pelvis_ctrl_space], con_type='parent')
-        leg_pole_switch = make_space_switch(main_net.legs[index].pole_ctrls[0], targets=[main_ctrl_space, pelvis_ctrl_space, foot_ctrl_space], con_type='parent')
-
-        # Parent Constraint FK IK Root
-
-        # FK ARM Offset
+        # FK ARM Parent Constraint
         pymel.parentConstraint([clavicle.fk_ctrls[0], main_net.arms[index].fk_ctrls[0].getParent()], maintainOffset=True, skipRotate=('x', 'y', 'z'))
+        # IK ARM Parent Constraint
         pymel.parentConstraint([clavicle.fk_ctrls[0], main_net.arms[index].ik_jnts[0]], maintainOffset=True, skipRotate=('x', 'y', 'z'))
-
-        # Clavicle
+        # Clavicle Parent Constraint
         pymel.parentConstraint([main_net.spine[0].ik_ctrls[-1], clavicle.fk_ctrls[0].getParent()], maintainOffset=True, skipRotate=('x', 'y', 'z'))
 
-        # Upper Leg
+        # FK Leg Parent Constraint
         pymel.parentConstraint([main_net.spine[0].ik_ctrls[0], main_net.legs[index].fk_ctrls[0].getParent()], maintainOffset=True, skipRotate=('x', 'y', 'z'))
+        # Ik Leg Parent Constraint
         pymel.parentConstraint([main_net.spine[0].ik_ctrls[0], main_net.legs[index].ik_jnts[0]], maintainOffset=True, skipRotate=('x', 'y', 'z'))
 
-    # Parent Space Groups
-    # chest_ctrl_space.setParent(chest_ctrl_space.limb_grp)
-    # pelvis_ctrl_space.setParent(pelvis_ctrl_space.limb_grp)
+
+def build_roll_jnts(main_net, roll_jnt_count=3):
+    """Add roll jnts, count must be at least 1"""
+
+    increment = 1.0/float(roll_jnt_count)
+
+    def create_joints(jnt_a, jnt_b, net):
+        driver_rig = create_driver_rig(jnt_a, jnt_b, net)
+
+        info = naming_utils.ItemInfo(jnt_a)
+
+        for roll_idx in range(roll_jnt_count):
+
+            weight_b = increment * roll_idx
+            weight_a = 1 - weight_b
+
+            new_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', consts.INDEX[roll_idx]])
+            dup_jnt = pymel.duplicate(jnt_a, name=new_name)[0]
+            pymel.delete(dup_jnt.getChildren())
+            dup_jnt.setParent(jnt_a)
+            naming_utils.add_tags(dup_jnt, {'Network': net.name(), 'Utility': 'Roll'})
+
+            point_con = pymel.pointConstraint([jnt_a, jnt_b, dup_jnt])
+            point_con.w0.set(weight_a)
+            point_con.w1.set(weight_b)
+
+    def create_driver_rig(jnt_a, jnt_b, net):
+
+        info = naming_utils.ItemInfo(jnt_a)
+
+        grp_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', 'GRP'])
+        grp = virtual_classes.TransformNode(name=grp_name)
+        naming_utils.add_tags(grp, {'Network': net.name()})
 
 
+        # Driver A
+        new_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Driver', 'A'])
+        driver_a = pymel.duplicate(jnt_a, name=new_name)[0]
+        pymel.delete(driver_a.getChildren())
+        driver_a.setTranslation(jnt_b.getTranslation(worldSpace=True), worldSpace=True)
+        driver_a.setParent(grp)
 
-def group_limb(net):
-    # LimbGRP
-    limb_grp_name = naming_utils.concatenate([net.side, net.region, 'GRP'])
-    limb_grp = pymel.group(empty=True, name=limb_grp_name)
-    limb_grp.rotateOrder.set(net.jnts[0].rotateOrder.get())
-    limb_grp.setMatrix(net.jnts[0].getMatrix(worldSpace=True), worldSpace=True)
-    limb_grp = virtual_classes.attach_class(limb_grp, net)
-    naming_utils.add_tags(limb_grp, {'Network': net.name(), 'Utility': 'LimbGrp'})
+        # Driver B
+        new_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Driver', 'B'])
+        driver_b = pymel.duplicate(jnt_a, name=new_name)[0]
+        pymel.delete(driver_b.getChildren())
+        driver_b.setParent(driver_a)
 
-    # Group Ctrl Rig
-    log.info('Grouping CTRLS')
-    for node in net.getCtrlRig():
-        root = joint_utils.get_root(node)
-        if root and root != limb_grp and root not in net.jnts and root != 'JNT':  # Todo: Simplify this logic
-            root.setParent(limb_grp)
+        ikhandle_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', 'IK'])
+        ikhandle = pymel.ikHandle(startJoint=driver_a, endEffector=driver_b, name=ikhandle_name, solver='ikSCsolver')[0]
+        print type(ikhandle)
+        ikhandle.setParent(grp)
+        pymel.parentConstraint([jnt_a.getParent(), ikhandle], maintainOffset=True)
 
-    return limb_grp
+        return grp
+
+
+    for idx in range(2):
+        # Add Upper Arm Roll
+        create_joints(main_net.arms[idx].jnts[0], main_net.arms[idx].jnts[1], main_net.arms[idx])
+        create_joints(main_net.arms[idx].jnts[1], main_net.arms[idx].jnts[2], main_net.arms[idx])
+
+        create_joints(main_net.legs[idx].jnts[0], main_net.legs[idx].jnts[1], main_net.arms[idx])
+        create_joints(main_net.legs[idx].jnts[1], main_net.legs[idx].jnts[2], main_net.arms[idx])
+
+
 
 
 @general_utils.undo
@@ -542,12 +613,16 @@ def build_humanoid_rig(progress_bar, mirror=True):
         info = naming_utils.ItemInfo(jnt)
         key = naming_utils.concatenate([info.side, info.region])
 
+        if info.utility == 'Roll':
+            continue
+
         if key in jnt_dict:
             jnt_dict[key].append(jnt)
         elif info.region:
             jnt_dict[key] = [jnt]
 
     progress_bar.setMaximum(len(jnt_dict))
+
 
     # Create Main
     main = virtual_classes.MainNode()
@@ -647,6 +722,9 @@ def build_humanoid_rig(progress_bar, mirror=True):
     build_space_switching(main_net=main)
     progress_bar.setValue(progress_bar.maximum())
     progress_bar.hide()
+
+    # Build Roll Joints
+    build_roll_jnts(main_net=main)
 
 
 """TEST CODE"""

@@ -52,7 +52,11 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
         ]
     def remove_callbacks(self):
         for callback in self.events:
-            OpenMaya.MEventMessage.removeCallback(callback)
+            try:
+                OpenMaya.MEventMessage.removeCallback(callback)
+            except:
+                pass
+
 
 
     # @QtCore.Slot(): Decorator based on widget name that connects QT signal.

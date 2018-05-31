@@ -30,7 +30,7 @@ INDEX = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
 TYPE = ['GRP', 'JNT', 'CTRL', 'HDL', 'Offset', 'Annotation', 'LOC', 'Utility', 'Condition', 'Constraint',
         'Main', 'Switch']
 
-UTILITY = ['IK', 'FK', 'IKFK']  # What does the object deal with
+UTILITY = ['IK', 'FK', 'IKFK', 'ROLL']  # What does the object deal with
 
 IK = ['Hand', 'Pole', 'Foot']
 
