@@ -34,6 +34,18 @@ def get_root(transform):
             return
     return
 
+def get_aim_vector(jnt_b):
+    """
+    :param jnt_b: End Joint
+    :return: A normalized object space aim vector to the parent joint.
+    """
+
+    vector = om.MVector(jnt_b.getTranslation(space='object'))
+
+    vector.normalize()
+
+    return -vector.x, -vector.y, -vector.z
+
 
 def get_pole_position(joint_chain, pole_dist=20):
     """
