@@ -30,9 +30,11 @@ def delete_rig():
 
     pymel.delete(pymel.ls(type='network'))
 
-    for jnt in pymel.ls():
-        if jnt.hasAttr('_class'):
-            jnt.deleteAttr('_class')
+    for jnt in pymel.ls(type='joint'):
+        attr_list = jnt.listAttr(userDefined=True, leaf=True)
+
+        for attr in attr_list:
+            attr.delete()
 
 
 def group_limb(net):
@@ -202,7 +204,8 @@ def build_ikfk_limb(jnts, net=None, fk_size=2.0, fk_shape='Circle', ik_size=1.0,
         switch.IKFK.connect(orient.w1)
 
     # IK Snap Loc
-    ik_loc = pymel.spaceLocator()
+    ik_loc_name = naming_utils.concatenate([net.jnts[2].name_info.base_name, net.jnts[2].name_info.joint_name, 'Snap', 'LOC'])
+    ik_loc = pymel.spaceLocator(name=ik_loc_name)
     ik_loc.message.connect(net.IK_SNAP_LOC[0])
     naming_utils.add_tags(ik_loc, {'Network': net.name(), 'Utility': 'IK'})
 
@@ -554,15 +557,11 @@ def build_roll_jnts(main_net, roll_jnt_count=3):
         :return:
         """
 
-        # Add Do Not Skin Tag To Main, todo: Set skinning tools to work with tags.
-        if not lower_limb:
-            naming_utils.add_tags(jnt_a, {'_Skin': 'False'})
-            naming_utils.add_tags(jnt_b, {'_Skin': 'False'})
-
         driver_a, driver_b = create_driver_rig(jnt_a, jnt_b, net, reverse=lower_limb, up_axis=up_axis)
 
         info = naming_utils.ItemInfo(jnt_a)
 
+        # Create Roll Joint
         for roll_idx in range(roll_jnt_count):
 
             weight_b = increment * roll_idx
@@ -570,7 +569,8 @@ def build_roll_jnts(main_net, roll_jnt_count=3):
 
             name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', consts.INDEX[roll_idx]])
             dup_jnt = pymel.duplicate(jnt_a, name=name)[0]
-            dup_jnt.radius.set(15)
+            dup_jnt.radius.set(8)
+            naming_utils.add_tags(dup_jnt, {'_skin': 'True'})
             pymel.delete(dup_jnt.getChildren())
             # Parent Roll joint to Jnt A
             dup_jnt.setParent(jnt_a)
@@ -688,6 +688,13 @@ def build_humanoid_rig(progress_bar, mirror=True):
 
         if info.utility == 'Roll':
             continue
+
+        if info.joint_name == 'Shoulder' or info.joint_name == 'Hip':
+            naming_utils.add_tags(jnt, {'_skin': 'False'})
+
+        else:
+            naming_utils.add_tags(jnt, {'_skin': 'True'})
+
 
         if key in jnt_dict:
             jnt_dict[key].append(jnt)

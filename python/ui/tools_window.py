@@ -11,7 +11,7 @@ import pymel.core as pymel
 
 # Libs
 from python.interop.utils import attr_utils
-from python.libs import build_ctrls, joint_utils, pose_utils, ikfk_switch
+from python.libs import build_ctrls, joint_utils, pose_utils, ikfk_switch, skin_utils
 from python.ui import ctrl_builder_window
 from python.modules import build_rig
 
@@ -23,6 +23,7 @@ reload(ikfk_switch)
 reload(build_ctrls)
 reload(joint_utils)
 reload(pose_utils)
+reload(skin_utils)
 
 
 log = logging.getLogger(__name__)
@@ -127,6 +128,13 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     def on_btn_to_fk_clicked(self):
         log.info('on_btn_to_fk_clicked')
         ikfk_switch.switch_to_fk()
+
+    @QtCore.Slot()
+    def on_btn_skin_mesh_clicked(self):
+        log.info('on_btn_skin_mesh_clicked')
+        skin_utils.skin_mesh(pymel.selected())
+
+
 
     @QtCore.Slot()
     def on_btn_select_all_ctrls_clicked(self):

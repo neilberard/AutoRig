@@ -113,8 +113,6 @@ def add_tags(obj, tags):
         else:
             obj.setAttr(key, tags[key])
 
-
-
 def list_tags(obj):
     obj_attributes = {}
 

@@ -63,11 +63,24 @@ class BaseNode():
             return pymel.PyNode(self.Network.get())
 
     @property
+    def networkAttr(self):
+        for obj in self.message.connections(plugs=True):
+            if obj.node().hasAttr('_class'):
+                return obj
+
+    @property
     def main(self):
-        return self.network.message.connections()[0]
+        for obj in self.network.message.connections():
+            if obj.node().hasAttr('_class'):
+                return obj
 
     @property
     def mainAttr(self):
+        for obj in self.network.message.connections(plugs=True):
+            if obj.node().hasAttr('_class'):
+                return obj
+
+
         return self.network.message.connections(plugs=True)[0]
 
     @property
@@ -120,7 +133,8 @@ class BaseNode():
 
     @property
     def switch(self):
-        return self.network.SWITCH.connections()[0]
+        return self.network.SWITCH.connections()[0] # todo: This is busted since clavicle is overriding switch method, use self.network.switch for now
+
 
     @property
     def ikHandlesAttr(self):
@@ -170,6 +184,16 @@ class BaseNode():
             if obj.hasAttr('Network') and obj.Network.get() == self.network.name() and obj not in self.jnts:
                 nodes.append(obj)
         return nodes
+
+    def getMirroredCtrl(self):
+        net_attr = self.networkAttr  # Storing the network attr
+        limb = self.mainAttr  # Storing the main limb attr
+
+        for idx, element in enumerate(limb.array().elements()):
+            if idx != limb.index():  # Traverse through the other limb network
+                mirror_net = limb.array().elementByLogicalIndex(idx).connections()[0]
+                mirror_array = mirror_net.getAttr(net_attr.array().attrName())
+                return mirror_array[net_attr.index()]
 
 
 class JointNode(pymel.nodetypes.Joint, BaseNode):
@@ -565,7 +589,9 @@ class ClavicleNode(LimbNode):
         print self.mainAttr
         try:
             attr = self.mainAttr
+            print attr.index()
             net = self.main.arms[attr.index()]
+            print net
             return net.switch
         except:
             log.warning('Failed to find IKFK, is this node hooked up to main?')

@@ -36,7 +36,7 @@ def get_mirrored_obj(obj):
     :return: mirrored object.
     """
 
-    net_attr = obj.message.connections(plugs=True)[0]  # Storing the network attr
+    net_attr = obj.message.connections(type=virtual_classes.LimbNode, plugs=True)[0]  # Storing the network attr
     limb = obj.network.message.connections(plugs=True)[0]  # Storing the main limb attr
 
     for idx, element in enumerate(limb.array().elements()):
@@ -54,15 +54,10 @@ def get_mirror_data(obj):
     if obj.region == 'Spine' or obj.region == 'Head' or obj.region == 'Main':
         mirrored_obj = obj
 
-    # Special case for clavicle since the ctrl has a separate network.
-    elif obj.network.region == 'Clavicle':
-        mirrored_obj = get_mirrored_obj(obj)
+    else:
+        mirrored_obj = obj.getMirroredCtrl()
         ikfk_value = obj.network.switch.IKFK.get()
         mirrored_obj.network.switch.IKFK.set(ikfk_value)
-    else:
-        mirrored_obj = get_mirrored_obj(obj)
-        ikfk_value = obj.switch.IKFK.get()
-        mirrored_obj.switch.IKFK.set(ikfk_value)
 
     pos = obj.getTranslation(worldSpace=False)
     rot = obj.getRotation(quaternion=True)
@@ -89,6 +84,8 @@ def mirror_ctrls(ctrls):
         mirror_data.append(data)
 
     for obj, transform in mirror_data:
+
+        print transform['rot']
 
         if 'pos' in transform:
             obj.setTranslation(transform['pos'])
