@@ -41,7 +41,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -473,8 +473,8 @@
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="2" column="0">
-       <widget class="QPushButton" name="btn_make_switch">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="btn_skin_mesh">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -482,12 +482,12 @@
          </size>
         </property>
         <property name="text">
-         <string>Make IKFK Switch</string>
+         <string>Skin Mesh</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QPushButton" name="btn_make_tags">
+       <widget class="QPushButton" name="btn_import_rom">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -495,27 +495,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Create Tags</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QPushButton" name="btn_delete_controls_2">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Delete Control Rig</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QPushButton" name="btn_skin_mesh">
-        <property name="text">
-         <string>Skin Mesh</string>
+         <string>Import Range of Motion animation</string>
         </property>
        </widget>
       </item>

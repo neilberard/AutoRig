@@ -541,7 +541,114 @@ def build_space_switching(main_net):
         pymel.parentConstraint([main_net.spine[0].ik_ctrls[0], main_net.legs[index].ik_jnts[0]], maintainOffset=True, skipRotate=('x', 'y', 'z'))
 
 
-def build_roll_jnts(main_net, roll_jnt_count=3):
+def build_lower_limb_roll_jnts(main_net, roll_jnt_count=3, up_axis='+Z'):
+    """
+    This method is driven by the rotation the end jnt such as wrist using an aim constraint.
+    :param main_net:
+    :param roll_jnt_count:
+    :param up_axis:
+    :return:
+    """
+
+    increment = 1.0/float(roll_jnt_count)
+
+    def create_driver_rig(jnt_a, jnt_b, net, up_axis=None):
+
+        info = naming_utils.ItemInfo(jnt_a)
+
+        # Driver Group
+        grp_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', 'GRP'])
+        grp = virtual_classes.TransformNode(name=grp_name)
+        naming_utils.add_tags(grp, {'Network': net.name()})
+        pymel.parentConstraint([jnt_a, grp])
+        grp.setParent(grp.limb_grp)
+
+        # Driver A
+        new_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Driver', 'A'])
+        driver_a = pymel.duplicate(jnt_a, name=new_name)[0]
+        pymel.delete(driver_a.getChildren())
+        driver_a.setTranslation(jnt_b.getTranslation(worldSpace=True), worldSpace=True)
+        driver_a.setParent(grp)
+
+        # UP Axis Locator
+        new_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'World', 'Up'])
+        up_loc = pymel.spaceLocator(name=new_name)
+        naming_utils.add_tags(up_loc, {'Network': net.name()})
+        up_loc.setTranslation(driver_a.getTranslation(worldSpace=True), worldSpace=True)
+        up_loc.setRotation(driver_a.getRotation(worldSpace=True), worldSpace=True)
+
+        # Connect locator
+        up_loc.setParent(grp)
+
+        # Place the up locator to up axis offset.
+        attr = pymel.PyNode('{}.translate{}'.format(up_loc.name(), up_axis[-1]))
+        value = float('{}{}'.format(up_axis[0], 10))
+        attr.set(attr.get() + value)
+
+        pymel.parentConstraint([jnt_b, up_loc], maintainOffset=True)
+        aim_vector = joint_utils.get_aim_vector(jnt_b)
+
+        # Aim Constriant
+        pymel.aimConstraint([jnt_a, driver_a], aimVector=(aim_vector), upVector=(0, 0, 1), worldUpObject=up_loc, worldUpType='Object')
+
+        return driver_a
+
+    def create_joints(jnt_a, jnt_b, net):
+        """
+        :param jnt_a: Start Joint
+        :param jnt_b: End Joint
+        :param net: Limb Network node
+        :param lower_limb: This uses an aim constraint method for end driven rotation, the default uses a ikSc Solver
+        for upper arm and upper leg rotation that is driven by the parent jnt.
+        :param up_axis: For placement of the up locator, must be specified as positive or negative. '+Z', '-X', '+Y'
+        :return:
+        """
+
+        driver_a = create_driver_rig(jnt_a, jnt_b, net, up_axis=up_axis)
+
+        info = naming_utils.ItemInfo(jnt_a)
+
+        # Create Roll Joint
+        for roll_idx in range(roll_jnt_count):
+
+            weight_b = (increment * roll_idx) + increment
+            weight_a = 1 - weight_b
+
+            name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', consts.INDEX[roll_idx]])
+            dup_jnt = pymel.duplicate(jnt_a, name=name)[0]
+            dup_jnt.radius.set(8)
+            naming_utils.add_tags(dup_jnt, {'_skin': 'True'})
+            pymel.delete(dup_jnt.getChildren())
+            # Parent Roll joint to Jnt A
+            dup_jnt.setParent(jnt_a)
+            naming_utils.add_tags(dup_jnt, {'Network': net.name(), 'Utility': 'Roll'})
+            point_con = pymel.pointConstraint([jnt_a, jnt_b, dup_jnt])
+
+            # Point Constraint weight
+            point_con.w0.set(weight_a)
+            point_con.w1.set(weight_b)
+
+            # Multiply/Divide Node
+            name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Multi', consts.INDEX[roll_idx]])
+            multi_utility = pymel.shadingNode('multiplyDivide', name=name, asUtility=True)
+            naming_utils.add_tags(multi_utility, {'Network': net.name(), 'Utility': 'Roll'})
+
+            # Using Driver A for the Wrist and Ankle
+            driver_a.rotateX.connect(multi_utility.input1X)
+            multi_utility.input2X.set(weight_b)
+            multi_utility.outputX.connect(dup_jnt.rotateX)
+
+    # idx[0] LEFT Side, idx[1] Right Side
+    for idx in range(2):
+
+        # Add ForeArm
+        create_joints(main_net.arms[idx].jnts[1], main_net.arms[idx].jnts[2], main_net.arms[idx])
+
+        # Add Ankle
+        create_joints(main_net.legs[idx].jnts[1], main_net.legs[idx].jnts[2], main_net.legs[idx])
+
+
+def build_upper_limb_roll_jnts(main_net, roll_jnt_count=3):
     """Add roll jnts, count must be at least 1"""
 
     increment = 1.0/float(roll_jnt_count)
@@ -578,28 +685,19 @@ def build_roll_jnts(main_net, roll_jnt_count=3):
             naming_utils.add_tags(dup_jnt, {'Network': net.name(), 'Utility': 'Roll'})
             point_con = pymel.pointConstraint([jnt_a, jnt_b, dup_jnt])
 
-            if lower_limb:
-                point_con.w0.set(weight_b)
-                point_con.w1.set(weight_a)
-            else:  # Weighting toward child
-                point_con.w0.set(weight_a)
-                point_con.w1.set(weight_b)
+            # Weighting toward child
+            point_con.w0.set(weight_a)
+            point_con.w1.set(weight_b)
 
             # Multi Node
             name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Multi', consts.INDEX[roll_idx]])
             multi_utility = pymel.shadingNode('multiplyDivide', name=name, asUtility=True)
             naming_utils.add_tags(multi_utility, {'Network': net.name(), 'Utility': 'Roll'})
 
-            if lower_limb:  # Using Driver A for the Wrist and Ankle
-                driver_a.rotateX.connect(multi_utility.input1X)
-                multi_utility.input2X.set(weight_a)
-                multi_utility.outputX.connect(dup_jnt.rotateX)
-
-            else:  # Using jnt_a for Shoulder and Upper Leg
-                driver_a.rotateX.connect(multi_utility.input1X)
-                multi_utility.input2X.set(weight_a)
-                multi_utility.outputX.connect(dup_jnt.rotateX)
-
+            # Using jnt_a for Shoulder and Upper Leg
+            driver_a.rotateX.connect(multi_utility.input1X)
+            multi_utility.input2X.set(weight_a)
+            multi_utility.outputX.connect(dup_jnt.rotateX)
 
     def create_driver_rig(jnt_a, jnt_b, net, reverse=False, up_axis=None):
 
@@ -625,57 +723,22 @@ def build_roll_jnts(main_net, roll_jnt_count=3):
         pymel.delete(driver_b.getChildren())
         driver_b.setParent(driver_a)
 
-        if not reverse:
-            ikhandle_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', 'IK'])
-            ikhandle = pymel.ikHandle(startJoint=driver_a, endEffector=driver_b, name=ikhandle_name, solver='ikSCsolver')[0]
-            ikhandle.setParent(grp)
-            pymel.parentConstraint([jnt_a.getParent(), ikhandle], maintainOffset=True)
+        ikhandle_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', 'IK'])
+        ikhandle = pymel.ikHandle(startJoint=driver_a, endEffector=driver_b, name=ikhandle_name, solver='ikSCsolver')[0]
+        ikhandle.setParent(grp)
+        pymel.parentConstraint([jnt_a.getParent(), ikhandle], maintainOffset=True)
 
-        if reverse:
-            # Aim constrain driver B to jnt_A
-            # UP Axis Locator
-            new_name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'World', 'Up'])
-            up_loc = pymel.spaceLocator(name=new_name)
-            naming_utils.add_tags(up_loc, {'Network': net.name()})
-            up_loc.setTranslation(driver_a.getTranslation(worldSpace=True), worldSpace=True)
-            up_loc.setRotation(driver_a.getRotation(worldSpace=True), worldSpace=True)
-
-            # Connect locator
-            up_loc.setParent(grp)
-
-            # Place the up locator to up axis offset.
-            attr = pymel.PyNode('{}.translate{}'.format(up_loc.name(), up_axis[-1]))
-            value = float('{}{}'.format(up_axis[0], 10))
-            attr.set(attr.get() + value)
-
-            pymel.parentConstraint([jnt_b, up_loc], maintainOffset=True)
-            aim_vector = joint_utils.get_aim_vector(jnt_b)
-
-            # Aim Constriant
-            driver_b.setParent(grp)
-            pymel.aimConstraint([jnt_a, driver_a], aimVector=(aim_vector), upVector=(0, 0, 1), worldUpObject=up_loc, worldUpType='Object')
 
         return driver_a, driver_b
 
     # Add Upper Arm Roll
-    idx = 0  # LEFT Side
-    create_joints(main_net.arms[idx].jnts[0], main_net.arms[idx].jnts[1], main_net.arms[idx])
-    # Add Wrist
-    create_joints(main_net.arms[idx].jnts[1], main_net.arms[idx].jnts[2], main_net.arms[idx], lower_limb=True, up_axis='+Z')
-    # Add Leg
-    create_joints(main_net.legs[idx].jnts[0], main_net.legs[idx].jnts[1], main_net.legs[idx])
-    # Add Ankle
-    create_joints(main_net.legs[idx].jnts[1], main_net.legs[idx].jnts[2], main_net.legs[idx], lower_limb=True,  up_axis='+Z')
+    # idx[0] LEFT Side, idx[1] Right Side
+    for idx in range(2):
+        # UpperArm
+        create_joints(main_net.arms[idx].jnts[0], main_net.arms[idx].jnts[1], main_net.arms[idx])
 
-    idx = 1  # RIGHT Side
-    # UpperArm
-    create_joints(main_net.arms[idx].jnts[0], main_net.arms[idx].jnts[1], main_net.arms[idx])
-    # Add Wrist
-    create_joints(main_net.arms[idx].jnts[1], main_net.arms[idx].jnts[2], main_net.arms[idx], lower_limb=True, up_axis='+Z')
-    # Add Leg
-    create_joints(main_net.legs[idx].jnts[0], main_net.legs[idx].jnts[1], main_net.legs[idx])
-    # Add Ankle
-    create_joints(main_net.legs[idx].jnts[1], main_net.legs[idx].jnts[2], main_net.legs[idx], lower_limb=True,  up_axis='+Z')
+        # UpperLeg
+        create_joints(main_net.legs[idx].jnts[0], main_net.legs[idx].jnts[1], main_net.legs[idx])
 
 
 @general_utils.undo
@@ -803,7 +866,8 @@ def build_humanoid_rig(progress_bar, mirror=True):
     progress_bar.hide()
 
     # Build Roll Joints
-    build_roll_jnts(main_net=main)
+    build_upper_limb_roll_jnts(main_net=main)
+    build_lower_limb_roll_jnts(main_net=main, up_axis='+Z')
 
 
 """TEST CODE"""

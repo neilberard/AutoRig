@@ -134,6 +134,11 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
         log.info('on_btn_skin_mesh_clicked')
         skin_utils.skin_mesh(pymel.selected())
 
+    @QtCore.Slot()
+    def on_btn_import_rom_clicked(self):
+        log.info('on_btn_import_rom_clicked')
+        pose_utils.select_all_ctrls()
+        skin_utils.import_range_of_motion()
 
 
     @QtCore.Slot()

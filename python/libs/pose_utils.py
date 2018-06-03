@@ -55,6 +55,7 @@ def get_mirror_data(obj):
         mirrored_obj = obj
 
     else:
+
         mirrored_obj = obj.getMirroredCtrl()
         ikfk_value = obj.network.switch.IKFK.get()
         mirrored_obj.network.switch.IKFK.set(ikfk_value)
