@@ -58,8 +58,6 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
             except:
                 pass
 
-
-
     # @QtCore.Slot(): Decorator based on widget name that connects QT signal.
     @QtCore.Slot()
     def on_btn_unlock_attr_clicked(self):
@@ -132,7 +130,8 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     @QtCore.Slot()
     def on_btn_skin_mesh_clicked(self):
         log.info('on_btn_skin_mesh_clicked')
-        skin_utils.skin_mesh(pymel.selected())
+        main_node = pymel.PyNode('Main_Net')
+        skin_utils.skin_mesh(pymel.selected(), main_node)
 
     @QtCore.Slot()
     def on_btn_import_rom_clicked(self):
@@ -161,13 +160,10 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
                     pass
 
             for idx, obj in enumerate(sel):
-
                 try:
                     obj.setMatrix(matrices[idx], worldSpace=True)
                 except:
                     pass
-
-
 
         print 'Changed!'
 
