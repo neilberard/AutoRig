@@ -851,6 +851,8 @@ def build_humanoid_rig(progress_bar, mirror=True):
     for net in pymel.ls(type='network'):
         if net.region == 'Main':
             build_main(net=net)
+            # Add Scale constraint
+            pymel.scaleConstraint([net.main_ctrl[0], net.ROOT.get()])
             progress_bar.setValue(progress_bar.value() + 1)
 
     # Build Arms
@@ -897,12 +899,14 @@ def build_humanoid_rig(progress_bar, mirror=True):
 
     # Build Space Switching
     build_space_switching(main_net=main)
-    progress_bar.setValue(progress_bar.maximum())
-    progress_bar.hide()
 
     # Build Roll Joints
     build_upper_limb_roll_jnts(main_net=main)
     build_lower_limb_roll_jnts(main_net=main, up_axis='+Z')
+
+    progress_bar.setValue(progress_bar.maximum())
+    progress_bar.hide()
+
 
 
 """TEST CODE"""
