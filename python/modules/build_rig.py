@@ -50,13 +50,13 @@ def group_limb(net):
     log.info('Grouping CTRLS')
     for node in net.getCtrlRig():
         root = joint_utils.get_root(node)
-        if root and root != limb_grp and root not in net.jnts and root != 'JNT':  # Todo: Simplify this logic
+        if root and root != limb_grp and root != net.main.ROOT[0].get():  # Todo: Simplify this logic
             root.setParent(limb_grp)
 
     return limb_grp
 
 
-def build_ikfk_limb(jnts, net=None, fk_size=2.0, fk_shape='Circle', ik_size=1.0, ik_shape='Cube01', pole_size=1.0, pole_shape='Cube01', ikfk_size=1.0, ikfk_shape='IKFK', region='', side=''):
+def build_ikfk_limb(jnts, net, fk_size=2.0, fk_shape='Circle', ik_size=1.0, ik_shape='Cube01', pole_size=1.0, pole_shape='Cube01', ikfk_size=1.0, ikfk_shape='IKFK', region='', side=''):
 
     """
     :param jnts:
@@ -110,7 +110,12 @@ def build_ikfk_limb(jnts, net=None, fk_size=2.0, fk_shape='Circle', ik_size=1.0,
     log.info('Building IK FK:')
 
     # FK CTRLS
+    increment = fk_size/len(fk_jnts)
+
     for idx, fk_jnt in enumerate(fk_jnts):
+
+        size = fk_size - (increment * idx) + (fk_size/2)
+
         ctrl_name = naming_utils.concatenate([net.Side.get(),
                                               net.jnts[idx].name_info.base_name,
                                               net.jnts[idx].name_info.joint_name,
@@ -119,7 +124,7 @@ def build_ikfk_limb(jnts, net=None, fk_size=2.0, fk_shape='Circle', ik_size=1.0,
                                               'CTRL'])
         ctrl_tags = {'Utility': 'FK', 'Axis': 'XY'}  # todo: add support for alternate mirror axis
         if idx <= 3:
-            ctrl = build_ctrls.create_ctrl(jnt=fk_jnt, name=ctrl_name, network=net, attr=net.FK_CTRLS, tags=ctrl_tags, size=fk_size, shape=fk_shape, axis='z')
+            ctrl = build_ctrls.create_ctrl(jnt=fk_jnt, name=ctrl_name, network=net, attr=net.FK_CTRLS, tags=ctrl_tags, size=size, shape=fk_shape, axis='z')
 
     for idx, fk in enumerate(net.fk_ctrls):
         if idx > 0:
@@ -232,7 +237,7 @@ def build_ikfk_limb(jnts, net=None, fk_size=2.0, fk_shape='Circle', ik_size=1.0,
             fk_vis_condition.outColorR.connect(obj.visibility)
 
 
-def build_spine(jnts, net=None):
+def build_spine(jnts, net, fk_size=2.0):
     assert isinstance(net, virtual_classes.SplineIKNet)
 
     info = naming_utils.ItemInfo(jnts[0])
@@ -274,7 +279,7 @@ def build_spine(jnts, net=None):
     naming_utils.add_tags(ikhandle, {'Network': net.name()})
     ikhandle.message.connect(net.IK_HANDLE[0])
 
-    def make_ctrl(jnt, children=None, shape='Cube01'):
+    def make_ctrl(jnt, children=None, shape='Cube01', size=1.0):
         """
 
         :param jnt:
@@ -285,7 +290,7 @@ def build_spine(jnts, net=None):
         name = naming_utils.concatenate([jnt.name_info.joint_name,
                                          jnt.name_info.index,
                                          'CTRL'])
-        ctrl = build_ctrls.create_ctrl(name=name, axis='y', shape=shape, network=net, attr=net.IK_CTRLS, offset=False)
+        ctrl = build_ctrls.create_ctrl(name=name, axis='y', shape=shape, network=net, attr=net.IK_CTRLS, offset=False, size=size)
         ctrl.setTranslation(jnt.getTranslation(worldSpace=True))
 
         for cluster in children:
@@ -293,11 +298,11 @@ def build_spine(jnts, net=None):
         return ctrl
 
     # Pelvis CTRL
-    pelvis_ctrl = make_ctrl(net.jnts[1], children=net.clusters[0:2], shape='Oval')
+    pelvis_ctrl = make_ctrl(net.jnts[1], children=net.clusters[0:2], shape='Spine01', size=1.0)
     # Mid CTRL
-    mid_ctrl = make_ctrl(net.jnts[2], children=net.clusters[2:3], shape='Oval')
+    mid_ctrl = make_ctrl(net.jnts[2], children=net.clusters[2:3], shape='Spine01', size=1.0)
     # Chest CTRL
-    chest_ctrl = make_ctrl(net.jnts[3], children=net.clusters[3:5], shape='Chest')
+    chest_ctrl = make_ctrl(net.jnts[3], children=net.clusters[3:5], shape='Chest', size=1.0)
     # COG
     cog = build_ctrls.create_ctrl(network=net, attr=net.COG, shape='Circle', size=5, name='COG', offset=False, axis='Y')
     cog.setTranslation(net.jnts[1].getTranslation(worldSpace=True))
@@ -329,7 +334,7 @@ def build_spine(jnts, net=None):
     curve_offset_a[0].inheritsTransform.set(False)
 
 
-def build_reverse_foot_rig(net=None):
+def build_reverse_foot_rig(net):
 
     assert isinstance(net, virtual_classes.LimbNode)
     #Set attrs
@@ -403,7 +408,7 @@ def build_reverse_foot_rig(net=None):
     pymel.parent(ankle_roll_grp, ankle_ik_grp)
 
 
-def build_clavicle(jnts, net=None):
+def build_clavicle(jnts, net):
 
     if net.side == 'L':
         ctrl = build_ctrls.create_ctrl(jnt=jnts[0], network=net, attr=net.FK_CTRLS, shape='Clavicle', mirrored=True)
@@ -415,7 +420,7 @@ def build_clavicle(jnts, net=None):
     pymel.parentConstraint([ctrl, jnts[0]])
 
 
-def build_head(jnts, net=None):
+def build_head(jnts, net):
 
     head_ctrl = None
     neck_ctrl = None
@@ -428,7 +433,7 @@ def build_head(jnts, net=None):
             pymel.parentConstraint([head_ctrl, jnt])
 
         elif info.joint_name == 'Neck':
-            neck_ctrl = build_ctrls.create_ctrl(jnt, name=naming_utils.concatenate([info.joint_name, 'CTRL']), size=2, attr=net.FK_CTRLS, network=net, axis='Y')
+            neck_ctrl = build_ctrls.create_ctrl(jnt, name=naming_utils.concatenate([info.joint_name, 'CTRL']), size=2.0, attr=net.FK_CTRLS, network=net, axis='Y', shape='Neck01')
             pymel.parentConstraint([neck_ctrl, jnt])
 
     head_ctrl.setParent(neck_ctrl)
@@ -437,7 +442,7 @@ def build_head(jnts, net=None):
     joint_utils.create_offset_groups(neck_ctrl, net=net)
 
 
-def build_main(ctrl_size=15, net=None):
+def build_main(net, ctrl_size=15):
     main_name = 'Main_CTRL'
     main_ctrl = build_ctrls.create_ctrl(name=main_name, shape='Arrows01', attr=net.MAIN_CTRL, size=ctrl_size, network=net, axis='Y')
 
@@ -615,8 +620,11 @@ def build_lower_limb_roll_jnts(main_net, roll_jnt_count=3, up_axis='+Z'):
             weight_a = 1 - weight_b
 
             name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', consts.INDEX[roll_idx]])
+            type = naming_utils.concatenate([info.base_name, info.joint_name, 'Roll', consts.INDEX[roll_idx]])
             dup_jnt = pymel.duplicate(jnt_a, name=name)[0]
             dup_jnt.radius.set(8)
+            dup_jnt.setAttr('otherType', type)
+
             naming_utils.add_tags(dup_jnt, {'_skin': 'True'})
             pymel.delete(dup_jnt.getChildren())
             # Parent Roll joint to Jnt A
@@ -675,8 +683,12 @@ def build_upper_limb_roll_jnts(main_net, roll_jnt_count=3):
             weight_a = 1 - weight_b
 
             name = naming_utils.concatenate([info.side, info.base_name, info.joint_name, 'Roll', consts.INDEX[roll_idx]])
+            type = naming_utils.concatenate([info.base_name, info.joint_name, 'Roll', consts.INDEX[roll_idx]])
+
             dup_jnt = pymel.duplicate(jnt_a, name=name)[0]
             dup_jnt.radius.set(8)
+            dup_jnt.setAttr('otherType', type)
+
             naming_utils.add_tags(dup_jnt, {'_skin': 'True'})
             pymel.delete(dup_jnt.getChildren())
             # Parent Roll joint to Jnt A
@@ -743,11 +755,33 @@ def build_upper_limb_roll_jnts(main_net, roll_jnt_count=3):
 
 @general_utils.undo
 def build_humanoid_rig(progress_bar, mirror=True):
+    """
+    This function requires all joints in the scene to belong to a single hierarchy.
+    :param progress_bar:
+    :param mirror:
+    :return:
+    """
 
     jnt_dict = {}
-    for jnt in pymel.ls(type='joint'):
+    jnts = pymel.ls(type='joint')
+    root = joint_utils.get_root(jnts[0])
+
+    for jnt in jnts:
         info = naming_utils.ItemInfo(jnt)
         key = naming_utils.concatenate([info.side, info.region])
+
+        jnt.setAttr('type', 'Other')
+        jnt.setAttr('otherType', info.joint_name)
+
+        if not info.side:
+            jnt.setAttr('side', 'Center')
+
+        if info.side == 'L':
+            jnt.setAttr('side', 'Left')
+
+        if info.side == 'R':
+            jnt.setAttr('side', 'Right')
+
 
         if info.utility == 'Roll':
             continue
@@ -758,7 +792,6 @@ def build_humanoid_rig(progress_bar, mirror=True):
         else:
             naming_utils.add_tags(jnt, {'_skin': 'True'})
 
-
         if key in jnt_dict:
             jnt_dict[key].append(jnt)
         elif info.region:
@@ -766,11 +799,13 @@ def build_humanoid_rig(progress_bar, mirror=True):
 
     progress_bar.setMaximum(len(jnt_dict))
 
-
     # Create Main
     main = virtual_classes.MainNode()
     pymel.rename(main, 'Main_Net')
     naming_utils.add_tags(main, tags={'Type': 'Main', 'Region': 'Main', 'Side': 'Center'})
+
+    # Connect Joint Root To Main Net
+    root.message.connect(main.ROOT[0])
 
     # Create Network Nodes
     for key in jnt_dict.keys():
@@ -821,7 +856,7 @@ def build_humanoid_rig(progress_bar, mirror=True):
     # Build Arms
     for net in pymel.ls(type='network'):
         if net.region == 'Arm':
-            build_ikfk_limb(jnts=net.jnts, net=net, ik_shape='Cube01')
+            build_ikfk_limb(jnts=net.jnts, net=net, ik_shape='Cube01', fk_size=2.0)
             pymel.orientConstraint([net.ik_ctrls[0], net.ik_jnts[2]], maintainOffset=True)
             grp = group_limb(net)
             grp.setParent(main.main_ctrl[0])
@@ -838,7 +873,7 @@ def build_humanoid_rig(progress_bar, mirror=True):
     # Build Legs
     for net in pymel.ls(type='network'):
         if net.region == 'Leg':
-            build_ikfk_limb(jnts=net.jnts, net=net, ik_shape='FootCube01')  # todo: add support for mirrored joints
+            build_ikfk_limb(jnts=net.jnts, net=net, ik_shape='FootCube01', fk_size=1.5)  # todo: add support for mirrored joints
             build_reverse_foot_rig(net=net)
             grp = group_limb(net)
             grp.setParent(main.main_ctrl[0])

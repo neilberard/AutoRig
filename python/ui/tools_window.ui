@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>455</width>
-    <height>539</height>
+    <height>494</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,10 +19,10 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>-1</x>
+     <x>0</x>
      <y>0</y>
-     <width>461</width>
-     <height>551</height>
+     <width>450</width>
+     <height>481</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -53,10 +53,10 @@
        <x>0</x>
        <y>3</y>
        <width>451</width>
-       <height>502</height>
+       <height>535</height>
       </rect>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,0">
       <property name="sizeConstraint">
        <enum>QLayout::SetNoConstraint</enum>
       </property>
@@ -83,7 +83,7 @@
         <property name="minimumSize">
          <size>
           <width>200</width>
-          <height>150</height>
+          <height>125</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -169,7 +169,7 @@
       <item>
        <widget class="QGroupBox" name="groupBox_2">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -177,7 +177,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>175</height>
+          <height>100</height>
          </size>
         </property>
         <property name="title">
@@ -195,12 +195,27 @@
            <x>0</x>
            <y>20</y>
            <width>431</width>
-           <height>161</height>
+           <height>91</height>
           </rect>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
-          <property name="margin">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetNoConstraint</enum>
+          </property>
+          <property name="leftMargin">
            <number>6</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>6</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>0</number>
           </property>
           <item row="2" column="0">
            <widget class="QPushButton" name="btn_to_fk">
@@ -215,21 +230,8 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QPushButton" name="btn_to_ik">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>To IK</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="1">
-           <widget class="QPushButton" name="btn_reset_rig">
+           <widget class="QPushButton" name="btn_select_all_ctrls">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -237,7 +239,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Reset Rig </string>
+             <string>Select All CTRLs</string>
             </property>
            </widget>
           </item>
@@ -254,8 +256,8 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QPushButton" name="btn_reset_selected">
+          <item row="2" column="1">
+           <widget class="QPushButton" name="btn_to_ik">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -263,20 +265,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Reset Selected</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="btn_select_all_ctrls">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Select All CTRLs</string>
+             <string>To IK</string>
             </property>
            </widget>
           </item>
@@ -284,7 +273,54 @@
         </widget>
         <zorder>gridLayoutWidget_5</zorder>
         <zorder>groupBox</zorder>
+        <zorder>gridLayoutWidget_4</zorder>
        </widget>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <property name="topMargin">
+         <number>10</number>
+        </property>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="btn_reset_selected">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Reset Selected</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QPushButton" name="btn_reset_rig">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Reset Rig </string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="btn_reset_limb">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Reset Limb</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QLabel" name="lbl_cb_space">
@@ -327,6 +363,19 @@
          <bool>true</bool>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>

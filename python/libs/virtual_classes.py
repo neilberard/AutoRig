@@ -56,9 +56,9 @@ class BaseNode():
     @property
     def network(self):
         if self.message.connections():
-            for object in self.message.connections():
-                if object.hasAttr('_class'):
-                    return object
+            for obj in self.message.connections():
+                if obj.hasAttr('_class'):
+                    return obj
 
         elif self.hasAttr('Network'):
             return pymel.PyNode(self.Network.get())
@@ -380,6 +380,7 @@ class MainNode(pymel.nodetypes.Network, BaseNode):
         newNode.addAttr('LEGS', attributeType='message', multi=True)
         newNode.addAttr('SPINE', attributeType='message', multi=True)
         newNode.addAttr('HEAD', attributeType='message', multi=True)
+        newNode.addAttr('ROOT', attributeType='message', multi=True)
 
     @property
     def network(self):

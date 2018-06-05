@@ -4,18 +4,36 @@ reload(ikfk_switch)
 reload(virtual_classes)
 reload(general_utils)
 
+
 @general_utils.undo
 def reset_rig():
     for obj in pymel.listTransforms():
-        if obj.hasAttr('Type') and obj.Type.get() == 'CTRL':
-            try:
-                obj.setRotation((0, 0, 0))
-                obj.setTranslation((0, 0, 0))
-                for attr in obj.listAttr(userDefined=True, scalar=True):
-                    if attr.name() != 'Offset':
-                        attr.set(0)
-            except:
-                pass
+        reset_ctrl(obj)
+
+
+@general_utils.undo
+def reset_selected():
+    for obj in pymel.selected():
+        reset_ctrl(obj)
+
+
+@general_utils.undo
+def reset_limb():
+    ctrl = pymel.selected()[0]
+    for obj in ctrl.getAllCtrls():
+        reset_ctrl(obj)
+
+def reset_ctrl(obj):
+    if obj.hasAttr('Type') and obj.Type.get() == 'CTRL':
+        try:
+            obj.setRotation((0, 0, 0))
+            obj.setTranslation((0, 0, 0))
+            obj.setScale((1, 1, 1))
+            for attr in obj.listAttr(userDefined=True, scalar=True):
+                if attr.name() != 'Offset':
+                    attr.set(0)
+        except:
+            pass
 
 
 def select_all_ctrls():
@@ -27,23 +45,6 @@ def select_all_ctrls():
             selection_list.append(obj)
 
     pymel.select(selection_list)
-
-
-def get_mirrored_obj(obj):
-    """
-    Assumes that each set of limbs has only two elememts, Right or Left.
-    :param obj: Any object that has a network node attachment
-    :return: mirrored object.
-    """
-
-    net_attr = obj.message.connections(type=virtual_classes.LimbNode, plugs=True)[0]  # Storing the network attr
-    limb = obj.network.message.connections(plugs=True)[0]  # Storing the main limb attr
-
-    for idx, element in enumerate(limb.array().elements()):
-        if idx != limb.index():  # Traverse through the other limb network
-            mirror_net = limb.array().elementByLogicalIndex(idx).connections()[0]
-            mirror_array = mirror_net.getAttr(net_attr.array().attrName())
-            return mirror_array[net_attr.index()]
 
 
 def get_mirror_data(obj):
@@ -74,6 +75,9 @@ def get_mirror_data(obj):
     else:
         transforms['rot'] = rot
 
+    if obj.hasAttr('Space'):
+        transforms['space'] = obj.getAttr('Space')
+
     return [mirrored_obj, transforms]
 
 @general_utils.undo
@@ -86,13 +90,16 @@ def mirror_ctrls(ctrls):
 
     for obj, transform in mirror_data:
 
-        print transform['rot']
+        if 'space' in transform:
+            obj.setAttr('Space', transform['space'])
 
         if 'pos' in transform:
             obj.setTranslation(transform['pos'])
 
         if 'rot' in transform:
             obj.setRotation(transform['rot'])
+
+
 
 
 if __name__ == '__main__':

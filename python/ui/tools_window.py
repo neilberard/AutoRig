@@ -58,18 +58,6 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
             except:
                 pass
 
-    # def call_back(self, func):
-    #     """Decorator to remove callbacks"""
-    #
-    #     def wrapper(*args, **kwargs):
-    #         self.remove_callbacks()
-    #         return func(*args, **kwargs)
-    #     self.setup_callbacks()
-    #
-    #     return wrapper
-
-
-    # @QtCore.Slot(): Decorator based on widget name that connects QT signal.
     @QtCore.Slot()
     def on_btn_unlock_attr_clicked(self):
         attr_utils.unlock_attributes(nodes=pymel.selected())
@@ -129,6 +117,16 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     def on_btn_reset_rig_clicked(self):
         log.info('on_btn_reset_rig_clicked')
         pose_utils.reset_rig()
+
+    @QtCore.Slot()
+    def on_btn_reset_selected_clicked(self):
+        log.info('on_btn_reset_selected_clicked')
+        pose_utils.reset_selected()
+
+    @QtCore.Slot()
+    def on_btn_reset_limb_clicked(self):
+        log.info('on_btn_reset_limb_clicked')
+        pose_utils.reset_limb()
 
     @QtCore.Slot()
     def on_btn_to_ik_clicked(self):
