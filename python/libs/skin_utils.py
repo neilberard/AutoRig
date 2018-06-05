@@ -10,23 +10,43 @@ def skin_mesh(meshes, main_node):
     :param main_node: Main network node.
     :return:
     """
-    main_node = pymel.PyNode('Main_Net')
+
+    xml = 'body_skin_weights.xml'
+
+    path = os.path.join(siteCustomize.ROOT_DIR, 'skin_data')
     root = main_node.spine[0].jnts[0]
 
     skin_list = []
 
     for jnt in root.listRelatives(allDescendents=True):
         if jnt.hasAttr('_skin') and jnt._skin.get() == 'True':
-            print jnt._skin.get()
             skin_list.append(jnt)
+
+    skin_list.append(root)
 
     skin_list.extend(meshes)
 
-    pymel.skinCluster(skin_list, toSelectedBones=True, maximumInfluences=4)
+    skin_cluster = pymel.skinCluster(skin_list, toSelectedBones=True, maximumInfluences=4)
+    print skin_cluster
 
-def import_range_of_motion():
+    pymel.deformerWeights(xml, im=True, deformer=skin_cluster, method='index', path=path)
+
+
+def import_range_of_motion(main_net):
+    pymel.select(main_net.getAllCtrls())
+
     path = os.path.join(siteCustomize.ROOT_DIR, 'animations', 'rom.atom')
-    print path
+    try:
+
+        pymel.importFile(path, type='atomImport')
+    except:
+        pass
+
+def clear_animation(main_net):
+    for ctrl in main_net.getAllCtrls():
+        pymel.cutKey(ctrl, clear=True)
+
+
 
     pass
 

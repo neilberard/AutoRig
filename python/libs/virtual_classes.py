@@ -46,6 +46,7 @@ def attach_class(node, net):
 
     log.warning('Could not find class for: '.format(node))
 
+
 class BaseNode():
     """
     Subclass must also inherit leaf class with pymel.nodetype.dagnode as it's hierarchy. IE: 'pymel.nodetypes.Joint'
@@ -194,6 +195,15 @@ class BaseNode():
                 mirror_net = limb.array().elementByLogicalIndex(idx).connections()[0]
                 mirror_array = mirror_net.getAttr(net_attr.array().attrName())
                 return mirror_array[net_attr.index()]
+
+    def getAllCtrls(self):
+        ctrl_list = set()
+
+        for obj in pymel.listTransforms():
+            if obj.hasAttr('Type') and obj.Type.get() == 'CTRL' and obj.hasAttr('Network') and obj.Network.get() == self.network.name():
+                ctrl_list.add(obj)
+
+        return list(ctrl_list)
 
 
 class JointNode(pymel.nodetypes.Joint, BaseNode):
@@ -402,6 +412,15 @@ class MainNode(pymel.nodetypes.Network, BaseNode):
     @property
     def head(self):
         return self.HEAD.connections()
+
+    def getAllCtrls(self):
+        ctrl_set = set()
+
+        for obj in pymel.listTransforms():
+            if obj.hasAttr('Type') and obj.Type.get() == 'CTRL':
+                ctrl_set.add(obj)
+
+        return list(ctrl_set)
 
 
 class CtrlNode(pymel.nodetypes.Transform, BaseNode):

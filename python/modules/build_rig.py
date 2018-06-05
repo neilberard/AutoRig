@@ -428,7 +428,7 @@ def build_head(jnts, net=None):
             pymel.parentConstraint([head_ctrl, jnt])
 
         elif info.joint_name == 'Neck':
-            neck_ctrl = build_ctrls.create_ctrl(jnt, name=naming_utils.concatenate([info.joint_name, 'CTRL']), size=2, attr=net.FK_CTRLS, network=net)
+            neck_ctrl = build_ctrls.create_ctrl(jnt, name=naming_utils.concatenate([info.joint_name, 'CTRL']), size=2, attr=net.FK_CTRLS, network=net, axis='Y')
             pymel.parentConstraint([neck_ctrl, jnt])
 
     head_ctrl.setParent(neck_ctrl)

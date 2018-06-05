@@ -6,3 +6,5 @@ You should see a new Auto rig shelf added.
 Note: The toolset is intended to work with Rig01.ma in the rigs folder.
 
 To Uninstall: delete the auto rig folder and Auto Rig shelf.
+
+

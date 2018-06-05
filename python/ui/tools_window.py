@@ -58,6 +58,17 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
             except:
                 pass
 
+    # def call_back(self, func):
+    #     """Decorator to remove callbacks"""
+    #
+    #     def wrapper(*args, **kwargs):
+    #         self.remove_callbacks()
+    #         return func(*args, **kwargs)
+    #     self.setup_callbacks()
+    #
+    #     return wrapper
+
+
     # @QtCore.Slot(): Decorator based on widget name that connects QT signal.
     @QtCore.Slot()
     def on_btn_unlock_attr_clicked(self):
@@ -95,12 +106,12 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     @QtCore.Slot()
     def on_btn_build_humanoid_clicked(self):
         log.info('on_btn_build_humanoid_clicked')
-        self.remove_callbacks()
+
         self.progress_bar = QtWidgets.QProgressBar(self)
         self.pb_main.setValue(0)
         self.pb_main.show()
         build_rig.build_humanoid_rig(self.pb_main, mirror=False)
-        self.setup_callbacks()
+
 
     @QtCore.Slot()
     def on_btn_delete_all_ctrls_clicked(self):
@@ -110,7 +121,9 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     @QtCore.Slot()
     def on_btn_mirror_ctrls_clicked(self):
         log.info('on_btn_mirror_ctrls_clicked')
+        self.remove_callbacks()
         pose_utils.mirror_ctrls(pymel.selected())
+        self.setup_callbacks()
 
     @QtCore.Slot()
     def on_btn_reset_rig_clicked(self):
@@ -130,15 +143,21 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     @QtCore.Slot()
     def on_btn_skin_mesh_clicked(self):
         log.info('on_btn_skin_mesh_clicked')
-        main_node = pymel.PyNode('Main_Net')
-        skin_utils.skin_mesh(pymel.selected(), main_node)
+        main_net = pymel.PyNode('Main_Net')
+        skin_utils.skin_mesh(pymel.selected(), main_net)
 
     @QtCore.Slot()
     def on_btn_import_rom_clicked(self):
         log.info('on_btn_import_rom_clicked')
-        pose_utils.select_all_ctrls()
-        skin_utils.import_range_of_motion()
+        main_net = pymel.PyNode('Main_Net')
+        skin_utils.import_range_of_motion(main_net)
 
+    @QtCore.Slot()
+    def on_btn_clear_anim_clicked(self):
+        log.info('on_btn_clear_anim_clicked')
+        main_net = pymel.PyNode('Main_Net')
+        skin_utils.clear_animation(main_net)
+        pose_utils.reset_rig()
 
     @QtCore.Slot()
     def on_btn_select_all_ctrls_clicked(self):
