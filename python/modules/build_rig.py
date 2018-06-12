@@ -442,6 +442,30 @@ def build_head(jnts, net):
     joint_utils.create_offset_groups(neck_ctrl, net=net)
 
 
+def build_hand(jnts, net, ctrl_size=0.6):
+
+    ctrls = []
+
+    for jnt in jnts:
+        name = naming_utils.concatenate([jnt.side, jnt.base_name, jnt.joint_name, jnt.info_index, 'CTRL'])
+
+        parent = jnt.getParent()
+
+        parent_name = naming_utils.concatenate([parent.side, parent.base_name, parent.joint_name, parent.info_index, 'CTRL'])
+
+        ctrl = build_ctrls.create_ctrl(jnt=jnt, network=net, size=ctrl_size, name=name)
+        ctrls.append(ctrl)
+        pymel.parentConstraint([ctrl, jnt])
+
+        if pymel.objExists(parent_name):
+            parent_ctrl = pymel.PyNode(parent_name)
+
+            ctrl.setParent(parent_ctrl)
+
+    for ctrl in ctrls:
+        joint_utils.create_offset_groups(ctrl)
+
+
 def build_main(net, ctrl_size=15):
     main_name = 'Main_CTRL'
     main_ctrl = build_ctrls.create_ctrl(name=main_name, shape='Arrows01', attr=net.MAIN_CTRL, size=ctrl_size, network=net, axis='Y')
@@ -512,7 +536,7 @@ def build_space_switching(main_net):
     # Parent Constraint Head Limb to Torso
     pymel.parentConstraint([main_net.spine[0].ik_ctrls[-1], main_net.head[0].fk_ctrls[0].getParent()], maintainOffset=True, skipRotate=('x', 'y', 'z'))
 
-    # Space Switch for Arms and Legs
+    # Space Switch for Arms and Legs and Hands
     for index, clavicle in enumerate(main_net.clavicles):
 
         clavicle_ctrl_space = make_space_grp(clavicle.fk_ctrls[0], orient=True)
@@ -544,6 +568,9 @@ def build_space_switching(main_net):
         pymel.parentConstraint([main_net.spine[0].ik_ctrls[0], main_net.legs[index].fk_ctrls[0].getParent()], maintainOffset=True, skipRotate=('x', 'y', 'z'))
         # Ik Leg Parent Constraint
         pymel.parentConstraint([main_net.spine[0].ik_ctrls[0], main_net.legs[index].ik_jnts[0]], maintainOffset=True, skipRotate=('x', 'y', 'z'))
+
+        # Parent Constraint Hands
+        pymel.parentConstraint([main_net.arms[index].jnts[-1], main_net.hands[index].limb_grp], maintainOffset=True)
 
 
 def build_lower_limb_roll_jnts(main_net, roll_jnt_count=3, up_axis='+Z'):
@@ -782,7 +809,6 @@ def build_humanoid_rig(progress_bar, mirror=True):
         if info.side == 'R':
             jnt.setAttr('side', 'Right')
 
-
         if info.utility == 'Roll':
             continue
 
@@ -808,7 +834,7 @@ def build_humanoid_rig(progress_bar, mirror=True):
     root.message.connect(main.ROOT[0])
 
     # Create Network Nodes
-    for key in jnt_dict.keys():
+    for key in sorted(jnt_dict.keys()):
 
         info = naming_utils.ItemInfo(key)
         if info.region == 'Spine':
@@ -834,10 +860,41 @@ def build_humanoid_rig(progress_bar, mirror=True):
             net = virtual_classes.LimbNode()
             idx = main.HEAD.getNumElements()
             net.message.connect(main.HEAD[idx])
+
+        elif info.region == 'Hand':
+            # Hand has many joint chains, unique code to deal with it.
+            net = virtual_classes.LimbNode()
+            idx = main.HANDS.getNumElements()
+            net.message.connect(main.HANDS[idx])
+            # Name Nodes
+            pymel.rename(net, naming_utils.concatenate([key, 'Net']))
+            naming_utils.add_tags(net, tags={'Type': 'IKFK', 'Region': info.region, 'Side': info.side})
+
+            hand_dict = {}
+            # Create a new dict with fingers as keys
+            for jnt in jnt_dict[key]:
+                jnt_info = naming_utils.ItemInfo(jnt.name())
+                key = jnt_info.joint_name
+
+                if key in hand_dict:
+                    hand_dict[key].append(jnt)
+                elif info.region:
+                    hand_dict[key] = [jnt]
+
+            for key in hand_dict.keys():
+                for jnt in hand_dict[key]:
+                    elem_idx = net.jntsAttr.getNumElements()
+                    print jnt, net
+                    jnt.message.connect(net.jntsAttr[elem_idx])
+                    virtual_classes.attach_class(jnt, net)
+
+            continue
+
         else:
             net = virtual_classes.LimbNode()
         info = naming_utils.ItemInfo(key)
 
+        # Name Nodes
         pymel.rename(net, naming_utils.concatenate([key, 'Net']))
         naming_utils.add_tags(net, tags={'Type': 'IKFK', 'Region': info.region, 'Side': info.side})
 
@@ -896,6 +953,14 @@ def build_humanoid_rig(progress_bar, mirror=True):
             grp = group_limb(net)
             grp.setParent(main.main_ctrl[0])
             progress_bar.setValue(progress_bar.value() + 1)
+
+    # Build Hands
+    for net in pymel.ls(type='network'):
+        if net.region == 'Hand':
+            build_hand(jnts=net.jnts, net=net)
+            grp = group_limb(net)
+            grp.setParent(main.main_ctrl[0])
+
 
     # Build Space Switching
     build_space_switching(main_net=main)

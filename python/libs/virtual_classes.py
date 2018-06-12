@@ -136,7 +136,6 @@ class BaseNode():
     def switch(self):
         return self.network.SWITCH.connections()[0] # todo: This is busted since clavicle is overriding switch method, use self.network.switch for now
 
-
     @property
     def ikHandlesAttr(self):
         return self.network.IK_HANDLE
@@ -156,6 +155,21 @@ class BaseNode():
     @property
     def region(self):
         return self.network.Region.get()
+
+    @property
+    def joint_name(self):
+        info = naming_utils.ItemInfo(self.name())
+        return info.joint_name
+
+    @property
+    def base_name(self):
+        info = naming_utils.ItemInfo(self.name())
+        return info.base_name
+
+    @property
+    def info_index(self):
+        info = naming_utils.ItemInfo(self.name())
+        return info.index
 
     @property
     def limb_grp(self):
@@ -380,6 +394,7 @@ class MainNode(pymel.nodetypes.Network, BaseNode):
         newNode.addAttr('LEGS', attributeType='message', multi=True)
         newNode.addAttr('SPINE', attributeType='message', multi=True)
         newNode.addAttr('HEAD', attributeType='message', multi=True)
+        newNode.addAttr('HANDS', attributeType='message', multi=True)
         newNode.addAttr('ROOT', attributeType='message', multi=True)
 
     @property
@@ -413,6 +428,10 @@ class MainNode(pymel.nodetypes.Network, BaseNode):
     @property
     def head(self):
         return self.HEAD.connections()
+
+    @property
+    def hands(self):
+        return self.HANDS.connections()
 
     def getAllCtrls(self):
         ctrl_set = set()
