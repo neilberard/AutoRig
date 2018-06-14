@@ -211,15 +211,18 @@ class BaseNode():
                 return mirror_array[net_attr.index()]
 
     def getAllCtrls(self):
-        ctrl_list = set()
 
-        for obj in pymel.listTransforms():
-            if obj.hasAttr('Type') and obj.Type.get() == 'CTRL' and obj.hasAttr('Network') and obj.Network.get() == self.network.name():
-                ctrl_list.add(obj)
+        return self.network.getAllCtrls()
+        # ctrl_list = set()
+        #
+        # for obj in pymel.listTransforms():
+        #     if obj.hasAttr('Type') and obj.Type.get() == 'CTRL' and obj.hasAttr('Network') and obj.Network.get() == self.network.name():
+        #         ctrl_list.add(obj)
+        #
+        # return list(ctrl_list)
 
-        return list(ctrl_list)
 
-
+# DAG CLASSES
 class JointNode(pymel.nodetypes.Joint, BaseNode):
     """ this is an example of how to create your own subdivisions of existing nodes. """
 
@@ -297,7 +300,127 @@ class TransformNode(BaseNode, pymel.nodetypes.Transform):
         newNode._class.set('_TransformNode')
 
 
-class SplineIKNet(pymel.nodetypes.Network, BaseNode):
+class CtrlNode(pymel.nodetypes.Transform, BaseNode):
+
+    @classmethod
+    def list(cls, *args, **kwargs):
+        """ Returns all instances the node in the scene """
+
+        kwargs['type'] = cls.__melnode__
+        return [node for node in pymel.ls(*args, **kwargs) if isinstance(node, cls)]
+
+    @classmethod
+    def _isVirtual(cls, obj, name):
+        """PyMEL code should not be used inside the callback, only API and maya.cmds. """
+        fn = pymel.api.MFnDependencyNode(obj)
+        try:
+            if fn.hasAttribute('_class'):
+                plug = fn.findPlug('_class')
+                if plug.asString() == '_CtrlNode':
+                    return True
+                return False
+        except:
+            pass
+        return False
+
+    @classmethod
+    def _preCreateVirtual(cls, **kwargs):
+        """This is called before creation. python allowed."""
+        return kwargs
+
+    @classmethod
+    def _postCreateVirtual(cls, newNode):
+        """ This is called before creation, pymel/cmds allowed."""
+        newNode.addAttr('_class', dataType='string')
+        newNode._class.set('_CtrlNode')
+        newNode.addAttr('SHAPE', attributeType='message', multi=True)
+
+    def freeze_transform(self):
+        pymel.makeIdentity(self, a=True, t=1, r=1, s=1, n=0, pn=1)
+
+    def set_shape(self, shape):
+        pymel.delete(self.getShape())
+        shapes.make_shape(shape_type=shape, transform=self)
+
+    def set_axis(self, axis):
+        if axis == 'x':
+            self.setRotation((90, 0, 0))
+
+        if axis == 'y':
+            self.setRotation((0, 0, 0))
+
+        if axis == 'z':
+            self.setRotation((0, 0, 90))
+
+    def create_offset(self):
+        grp = pymel.group(empty=True)
+        self.setParent(grp)
+        return grp
+
+
+# NETWORK CLASSES
+class LimbNode(pymel.nt.Network, BaseNode):
+    """ this is an example of how to create your own subdivisions of existing nodes. """
+
+    @classmethod
+    def list(cls, *args, **kwargs):
+        """ Returns all instances the node in the scene """
+
+        kwargs['type'] = cls.__melnode__
+        return [node for node in pymel.ls(*args, **kwargs) if isinstance(node, cls)]
+
+    @classmethod
+    def _isVirtual(cls, obj, name):
+        """PyMEL code should not be used inside the callback, only API and maya.cmds. """
+        fn = pymel.api.MFnDependencyNode(obj)
+        try:
+            if fn.hasAttribute('_class'):
+                plug = fn.findPlug('_class')
+                if plug.asString() == '_LimbNode':
+                    return True
+                return False
+        except:
+            pass
+        return False
+
+    @classmethod
+    def _preCreateVirtual(cls, **kwargs):
+        """This is called before creation. python allowed."""
+        return kwargs
+
+    @classmethod
+    def _postCreateVirtual(cls, newNode):
+        """ This is called before creation, pymel/cmds allowed."""
+        newNode.addAttr('_class', dt='string')
+        newNode._class.set('_LimbNode')
+        newNode.addAttr('JOINTS', attributeType='message', multi=True)
+        newNode.addAttr('IK_JOINTS', attributeType='message', multi=True)
+        newNode.addAttr('FK_JOINTS', attributeType='message', multi=True)
+        newNode.addAttr('IK_CTRLS', attributeType='message', multi=True)
+        newNode.addAttr('FK_CTRLS', attributeType='message', multi=True)
+        newNode.addAttr('CTRLS', attributeType='message', multi=True)
+        newNode.addAttr('POLE', attributeType='message', multi=True)
+        newNode.addAttr('SWITCH', attributeType='message', multi=True)
+        newNode.addAttr('ORIENTCONSTRAINT', attributeType='message', multi=True)
+        newNode.addAttr('POINTCONSTRAINT', attributeType='message', multi=True)
+        newNode.addAttr('IK_HANDLE', attributeType='message', multi=True)
+        newNode.addAttr('IK_SNAP_LOC', attributeType='message', multi=True)
+
+    @property
+    def network(self):
+        return self
+
+    def getAllCtrls(self):
+        ctrl_list = set()
+
+        for obj in pymel.listTransforms():
+            if obj.hasAttr('Type') and obj.Type.get() == 'CTRL' and obj.hasAttr('Network') and obj.Network.get() == self.network.name():
+                ctrl_list.add(obj)
+
+        return list(ctrl_list)
+
+
+class SplineIKNet(LimbNode):
     """ this is an example of how to create your own subdivisions of existing nodes. """
 
     @classmethod
@@ -354,7 +477,7 @@ class SplineIKNet(pymel.nodetypes.Network, BaseNode):
         return self.CLUSTER_HANDLE
 
 
-class MainNode(pymel.nodetypes.Network, BaseNode):
+class MainNode(LimbNode):
     """ this is an example of how to create your own subdivisions of existing nodes. """
 
     @classmethod
@@ -443,147 +566,6 @@ class MainNode(pymel.nodetypes.Network, BaseNode):
         return list(ctrl_set)
 
 
-class CtrlNode(pymel.nodetypes.Transform, BaseNode):
-
-    @classmethod
-    def list(cls, *args, **kwargs):
-        """ Returns all instances the node in the scene """
-
-        kwargs['type'] = cls.__melnode__
-        return [node for node in pymel.ls(*args, **kwargs) if isinstance(node, cls)]
-
-    @classmethod
-    def _isVirtual(cls, obj, name):
-        """PyMEL code should not be used inside the callback, only API and maya.cmds. """
-        fn = pymel.api.MFnDependencyNode(obj)
-        try:
-            if fn.hasAttribute('_class'):
-                plug = fn.findPlug('_class')
-                if plug.asString() == '_CtrlNode':
-                    return True
-                return False
-        except:
-            pass
-        return False
-
-    @classmethod
-    def _preCreateVirtual(cls, **kwargs):
-        """This is called before creation. python allowed."""
-        return kwargs
-
-    @classmethod
-    def _postCreateVirtual(cls, newNode):
-        """ This is called before creation, pymel/cmds allowed."""
-        newNode.addAttr('_class', dataType='string')
-        newNode._class.set('_CtrlNode')
-        newNode.addAttr('SHAPE', attributeType='message', multi=True)
-
-    def freeze_transform(self):
-        pymel.makeIdentity(self, a=True, t=1, r=1, s=1, n=0, pn=1)
-
-    def set_shape(self, shape):
-        pymel.delete(self.getShape())
-        shapes.make_shape(shape_type=shape, transform=self)
-
-    def set_axis(self, axis):
-        if axis == 'x':
-            self.setRotation((90, 0, 0))
-
-        if axis == 'y':
-            self.setRotation((0, 0, 0))
-
-        if axis == 'z':
-            self.setRotation((0, 0, 90))
-
-    def create_offset(self):
-        grp = pymel.group(empty=True)
-        self.setParent(grp)
-        return grp
-
-
-class LimbNode(pymel.nt.Network, BaseNode):
-    """ this is an example of how to create your own subdivisions of existing nodes. """
-
-    @classmethod
-    def list(cls, *args, **kwargs):
-        """ Returns all instances the node in the scene """
-
-        kwargs['type'] = cls.__melnode__
-        return [node for node in pymel.ls(*args, **kwargs) if isinstance(node, cls)]
-
-    @classmethod
-    def _isVirtual(cls, obj, name):
-        """PyMEL code should not be used inside the callback, only API and maya.cmds. """
-        fn = pymel.api.MFnDependencyNode(obj)
-        try:
-            if fn.hasAttribute('_class'):
-                plug = fn.findPlug('_class')
-                if plug.asString() == '_LimbNode':
-                    return True
-                return False
-        except:
-            pass
-        return False
-
-    @classmethod
-    def _preCreateVirtual(cls, **kwargs):
-        """This is called before creation. python allowed."""
-        return kwargs
-
-    @classmethod
-    def _postCreateVirtual(cls, newNode):
-        """ This is called before creation, pymel/cmds allowed."""
-        newNode.addAttr('_class', dt='string')
-        newNode._class.set('_LimbNode')
-        newNode.addAttr('JOINTS', attributeType='message', multi=True)
-        newNode.addAttr('IK_JOINTS', attributeType='message', multi=True)
-        newNode.addAttr('FK_JOINTS', attributeType='message', multi=True)
-        newNode.addAttr('IK_CTRLS', attributeType='message', multi=True)
-        newNode.addAttr('FK_CTRLS', attributeType='message', multi=True)
-        newNode.addAttr('CTRLS', attributeType='message', multi=True)
-        newNode.addAttr('POLE', attributeType='message', multi=True)
-        newNode.addAttr('SWITCH', attributeType='message', multi=True)
-        newNode.addAttr('ORIENTCONSTRAINT', attributeType='message', multi=True)
-        newNode.addAttr('POINTCONSTRAINT', attributeType='message', multi=True)
-        newNode.addAttr('IK_HANDLE', attributeType='message', multi=True)
-        newNode.addAttr('IK_SNAP_LOC', attributeType='message', multi=True)
-
-    @property
-    def network(self):
-        return self
-
-    # Getters and setters are not required, we have these here for unittesting
-    def get_my_name(self):
-        return self.myName.get()
-
-    def set_my_name(self, value):
-        self.myName.set(value)
-
-    def get_my_string(self):
-        return self._class.get()
-
-    def set_my_string(self, value):
-        self._class.set(value)
-
-    def get_my_float(self):
-        return self.myFloat.get()
-
-    def set_my_float(self, value):
-        self.myFloat.set(value)
-
-    def get_my_connection(self, index=0):
-        return self.myConnection.listConnections()[index]
-
-    def set_my_connection(self, node):
-        self.myConnection.connect(node.blackBox)
-
-    def toXML(self):
-        xml = cetree.Element('LimbNode')
-        xml.set('Name', self.get_my_name())
-
-        return xml
-
-
 class ClavicleNode(LimbNode):
 
     SUBNODE_TYPE = '_Clavicle'
@@ -625,15 +607,30 @@ class ClavicleNode(LimbNode):
 
     @property
     def switch(self):
-        print self.mainAttr
         try:
             attr = self.mainAttr
-            print attr.index()
             net = self.main.arms[attr.index()]
-            print net
             return net.switch
         except:
             log.warning('Failed to find IKFK, is this node hooked up to main?')
+
+    def getAllCtrls(self):
+        ctrl_list = set()
+
+        attr = self.mainAttr
+        net = self.main.arms[attr.index()]
+        print net
+
+        for obj in pymel.listTransforms():
+            # Clavicle CTRLS
+            if obj.hasAttr('Type') and obj.Type.get() == 'CTRL' and obj.hasAttr('Network') and obj.Network.get() == self.network.name():
+                ctrl_list.add(obj)
+            # Get Arm CTRLS
+            if obj.hasAttr('Type') and obj.Type.get() == 'CTRL' and obj.hasAttr('Network') and obj.Network.get() == net.name():
+                ctrl_list.add(obj)
+
+        return list(ctrl_list)
+
 
 # Classes need to be registered to exist in the scene.
 pymel.factories.registerVirtualClass(JointNode, nameRequired=False)
