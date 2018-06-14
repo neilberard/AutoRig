@@ -84,12 +84,12 @@ ALL = {'Ankle': 'Ankle',
 
 
 
-if __name__ == '__main__':
-        import itertools
-        items = list(set(itertools.chain(SPINE, ARM, LEG, HAND, SIDE, TYPE, IK)))
-        items.sort()
-
-        for i in items:
-                print "'{}': '{}',".format(i, i)
+# if __name__ == '__main__':
+#         import itertools
+#         items = list(set(itertools.chain(SPINE, ARM, LEG, HAND, SIDE, TYPE, IK)))
+#         items.sort()
+#
+#         for i in items:
+#                 print "'{}': '{}',".format(i, i)
 
 

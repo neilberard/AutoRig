@@ -27,7 +27,7 @@ def skin_mesh(meshes, main_node):
     skin_list.extend(meshes)
 
     skin_cluster = pymel.skinCluster(skin_list, toSelectedBones=True, maximumInfluences=4)
-    print skin_cluster
+
 
     pymel.deformerWeights(xml, im=True, deformer=skin_cluster, method='index', path=path)
 
@@ -45,6 +45,7 @@ def import_range_of_motion(main_net):
 def clear_animation(main_net):
     for ctrl in main_net.getAllCtrls():
         pymel.cutKey(ctrl, clear=True)
+
 
 
 

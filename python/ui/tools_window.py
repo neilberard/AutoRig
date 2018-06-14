@@ -124,9 +124,10 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
         pose_utils.reset_selected()
 
     @QtCore.Slot()
-    def on_btn_reset_limb_clicked(self):
-        log.info('on_btn_reset_limb_clicked')
-        pose_utils.reset_limb()
+    def on_btn_select_limb_clicked(self):
+        log.info('on_btn_select_limb_clicked')
+        sel = pymel.selected()[0]
+        pymel.select(sel.getAllCtrls())
 
     @QtCore.Slot()
     def on_btn_to_ik_clicked(self):
@@ -137,6 +138,24 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     def on_btn_to_fk_clicked(self):
         log.info('on_btn_to_fk_clicked')
         ikfk_switch.switch_to_fk()
+
+    @QtCore.Slot()
+    def on_btn_fk_clicked(self):
+        log.info('on_btn_fk_clicked')
+        for sel in pymel.selected():
+            try:
+                sel.switch.IKFK.set(0)
+            except:
+                pass
+
+    @QtCore.Slot()
+    def on_btn_ik_clicked(self):
+        log.info('on_btn_ik_clicked')
+        for sel in pymel.selected():
+            try:
+                sel.switch.IKFK.set(1)
+            except:
+                pass
 
     @QtCore.Slot()
     def on_btn_skin_mesh_clicked(self):
@@ -156,6 +175,12 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
         main_net = pymel.PyNode('Main_Net')
         skin_utils.clear_animation(main_net)
         pose_utils.reset_rig()
+
+    @QtCore.Slot()
+    def on_btn_clear_anim_sel_clicked(self):
+        log.info('on_btn_clear_anim_sel_clicked')
+        pymel.cutKey(pymel.selected(), clear=True)
+
 
     @QtCore.Slot()
     def on_btn_select_all_ctrls_clicked(self):

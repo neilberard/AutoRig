@@ -7,7 +7,6 @@ reload(virtual_classes)
 reload(general_utils)
 
 def to_ik(net, select=True):
-    print 'UPDATED!'
 
     # Special case for Clavicle since it is not connected to the arm network.
     if net.region == 'Clavicle':

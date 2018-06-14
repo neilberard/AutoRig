@@ -54,7 +54,7 @@ def get_pole_position(joint_chain, pole_dist=20):
     :param pole_dist
     :return: pole position
     """
-    print joint_chain[0].region
+
 
     if joint_chain[0].region == 'Leg':
         axis = '-ZY'
@@ -101,7 +101,6 @@ def get_pole_position(joint_chain, pole_dist=20):
 
     # Legs Orientation
     if axis == '-ZY':
-        print 'Legs'
         matrixV = [cross1.x * -1, cross1.y * -1, cross1.z * -1, 0,  # Perpendicular to plane
                    cross2.x, cross2.y, cross2.z, 0, # Parallel to the plane
                    arrowV.x * -1, arrowV.y * -1, arrowV.z * -1, 0,  # AIM vector
@@ -109,7 +108,6 @@ def get_pole_position(joint_chain, pole_dist=20):
 
     # ARM Mirrored (Left)
     if axis == '-ZX':
-        print 'left arm'
 
         matrixV = [cross2.x * -1, cross2.y * -1, cross2.z * -1, 0,  # Perpendicular to plane
                    cross1.x, cross1.y, cross1.z, 0, # Parallel to the plane
@@ -117,7 +115,6 @@ def get_pole_position(joint_chain, pole_dist=20):
                    0, 0, 0, 1]
     # ARM (Right)
     if axis == '+ZX':
-        print 'Right arm'
 
         matrixV = [cross2.x, cross2.y, cross2.z, 0,  # Perpendicular to plane
                    cross1.x * -1, cross1.y * -1, cross1.z * -1, 0,  # Parallel to the plane

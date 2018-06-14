@@ -4,9 +4,8 @@ import pymel.core as pymel
 from python.libs import build_ctrls
 from python.libs import general_utils
 from python.libs import joint_utils
-from python.libs import lib_network, naming_utils, virtual_classes, consts
+from python.libs import naming_utils, virtual_classes, consts
 
-reload(lib_network)
 reload(build_ctrls)
 reload(joint_utils)
 reload(naming_utils)
@@ -20,7 +19,12 @@ log.setLevel(logging.DEBUG)
 
 @general_utils.undo
 def delete_rig():
+
     for net in pymel.ls(type='network'):
+
+        if net.main.jnts[0].getParent():
+            net.main.jnts[0].setParent(None)
+
         try:
             pymel.delete(net.getCtrlRig())
 
@@ -37,9 +41,12 @@ def delete_rig():
             attr.delete()
 
 
-def group_limb(net):
+def group_limb(net, name=None):
     # LimbGRP
-    limb_grp_name = naming_utils.concatenate([net.side, net.region, 'GRP'])
+    if name:
+        limb_grp_name = name
+    else:
+        limb_grp_name = naming_utils.concatenate([net.side, net.region, 'GRP'])
     limb_grp = pymel.group(empty=True, name=limb_grp_name)
     limb_grp.rotateOrder.set(net.jnts[0].rotateOrder.get())
     limb_grp.setMatrix(net.jnts[0].getMatrix(worldSpace=True), worldSpace=True)
@@ -468,7 +475,10 @@ def build_hand(jnts, net, ctrl_size=0.6):
 
 def build_main(net, ctrl_size=15):
     main_name = 'Main_CTRL'
-    main_ctrl = build_ctrls.create_ctrl(name=main_name, shape='Arrows01', attr=net.MAIN_CTRL, size=ctrl_size, network=net, axis='Y')
+    root_name = 'Root_CTRL'
+    main_ctrl = build_ctrls.create_ctrl(name=main_name, shape='Arrows02', attr=net.MAIN_CTRL, size=ctrl_size, network=net, axis='Y')
+    root_ctrl = build_ctrls.create_ctrl(name=root_name, shape='WorldPos01', attr=net.MAIN_CTRL, size=10, network=net, axis='Y')
+    root_ctrl.setParent(main_ctrl)
 
 
 def build_space_switching(main_net):
@@ -884,7 +894,6 @@ def build_humanoid_rig(progress_bar, mirror=True):
             for key in hand_dict.keys():
                 for jnt in hand_dict[key]:
                     elem_idx = net.jntsAttr.getNumElements()
-                    print jnt, net
                     jnt.message.connect(net.jntsAttr[elem_idx])
                     virtual_classes.attach_class(jnt, net)
 
@@ -909,7 +918,10 @@ def build_humanoid_rig(progress_bar, mirror=True):
         if net.region == 'Main':
             build_main(net=net)
             # Add Scale constraint
-            pymel.scaleConstraint([net.main_ctrl[0], net.ROOT.get()])
+            root = net.ROOT.get()[0]
+
+            pymel.scaleConstraint([net.main_ctrl[0], root])
+            pymel.parentConstraint([net.main_ctrl[1], root])
             progress_bar.setValue(progress_bar.value() + 1)
 
     # Build Arms
@@ -972,6 +984,11 @@ def build_humanoid_rig(progress_bar, mirror=True):
     progress_bar.setValue(progress_bar.maximum())
     progress_bar.hide()
 
+    root = main.ROOT.get()[0]
+
+    main_grp_name = 'Rig_GRP'
+    main_grp = group_limb(main, name=main_grp_name)
+    root.setParent(main_grp)
 
 
 """TEST CODE"""

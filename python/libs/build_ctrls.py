@@ -4,13 +4,11 @@ import maya.OpenMaya as om
 from python.libs import consts, naming_utils
 from python.libs import shapes
 from python.libs import joint_utils
-from python.libs import lib_network
 from python.libs import virtual_classes
 reload(shapes)
 reload(naming_utils)
 reload(consts)
 reload(joint_utils)
-reload(lib_network)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -238,10 +236,10 @@ class ControlBuilder(object):
 
 """TEST CODE"""
 
-if __name__ == '__main__':
-
-    ctrls = CreateCtrl(jnt=pymel.selected()[0])
-    print ctrls.get_ctrl_distance()
+# if __name__ == '__main__':
+#
+#     ctrls = CreateCtrl(jnt=pymel.selected()[0])
+#     print ctrls.get_ctrl_distance()
 
 
 

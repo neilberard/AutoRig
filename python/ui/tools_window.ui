@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>nb_tools</class>
- <widget class="QDialog" name="nb_tools">
+ <class>auto_rig_tools</class>
+ <widget class="QDialog" name="auto_rig_tools">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>455</width>
-    <height>494</height>
+    <height>564</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>nb_tools</string>
+   <string>auto_rig_tools</string>
   </property>
   <widget class="QTabWidget" name="tabWidget">
    <property name="enabled">
@@ -22,7 +22,7 @@
      <x>0</x>
      <y>0</y>
      <width>450</width>
-     <height>481</height>
+     <height>561</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -161,9 +161,6 @@
           </item>
          </layout>
         </widget>
-        <zorder>pushButton</zorder>
-        <zorder>verticalLayoutWidget_3</zorder>
-        <zorder>verticalLayoutWidget_3</zorder>
        </widget>
       </item>
       <item>
@@ -177,7 +174,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>100</height>
+          <height>120</height>
          </size>
         </property>
         <property name="title">
@@ -195,7 +192,7 @@
            <x>0</x>
            <y>20</y>
            <width>431</width>
-           <height>91</height>
+           <height>102</height>
           </rect>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
@@ -217,37 +214,87 @@
           <property name="verticalSpacing">
            <number>0</number>
           </property>
-          <item row="2" column="0">
+          <item row="2" column="1">
            <widget class="QPushButton" name="btn_to_fk">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="minimumSize">
              <size>
-              <width>0</width>
+              <width>200</width>
               <height>30</height>
              </size>
             </property>
             <property name="text">
-             <string>To FK</string>
+             <string>TO FK (SNAP)</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QPushButton" name="btn_select_all_ctrls">
+           <widget class="QPushButton" name="btn_to_ik">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="minimumSize">
              <size>
-              <width>0</width>
+              <width>200</width>
               <height>30</height>
              </size>
             </property>
             <property name="text">
-             <string>Select All CTRLs</string>
+             <string>TO IK (SNAP)</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
+           <widget class="QPushButton" name="btn_ik">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>IK</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="btn_fk">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>FK</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
            <widget class="QPushButton" name="btn_mirror_ctrls">
             <property name="minimumSize">
              <size>
-              <width>0</width>
+              <width>200</width>
               <height>30</height>
              </size>
             </property>
@@ -256,24 +303,8 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QPushButton" name="btn_to_ik">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>To IK</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </widget>
-        <zorder>gridLayoutWidget_5</zorder>
-        <zorder>groupBox</zorder>
-        <zorder>gridLayoutWidget_4</zorder>
        </widget>
       </item>
       <item>
@@ -281,6 +312,51 @@
         <property name="topMargin">
          <number>10</number>
         </property>
+        <property name="verticalSpacing">
+         <number>20</number>
+        </property>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="btn_reset_rig">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>Reset Rig </string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="btn_select_all_ctrls">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Select All CTRLs</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="btn_select_limb">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Select Limb</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="1">
          <widget class="QPushButton" name="btn_reset_selected">
           <property name="minimumSize">
@@ -289,34 +365,11 @@
             <height>30</height>
            </size>
           </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
           <property name="text">
            <string>Reset Selected</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QPushButton" name="btn_reset_rig">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Reset Rig </string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QPushButton" name="btn_reset_limb">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Reset Limb</string>
           </property>
          </widget>
         </item>
@@ -420,7 +473,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QPushButton" name="btn_clear_anim">
         <property name="minimumSize">
          <size>
@@ -429,7 +482,20 @@
          </size>
         </property>
         <property name="text">
-         <string>Clear Animation</string>
+         <string>Clear Animation(All)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="btn_clear_anim_sel">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Clear Animation(Selected)</string>
         </property>
        </widget>
       </item>

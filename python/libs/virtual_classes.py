@@ -256,7 +256,6 @@ class JointNode(pymel.nodetypes.Joint, BaseNode):
 
     @classmethod
     def _postCreateVirtual(cls, newNode):
-        print newNode
         """ This is called before creation, pymel/cmds allowed."""
 
         pymel.addAttr(newNode, longName='_class', dataType='string')
@@ -294,7 +293,6 @@ class TransformNode(BaseNode, pymel.nodetypes.Transform):
 
     @classmethod
     def _postCreateVirtual(cls, newNode):
-        print newNode
         """ This is called before creation, pymel/cmds allowed."""
         newNode.addAttr('_class', dataType='string')
         newNode._class.set('_TransformNode')
@@ -525,8 +523,12 @@ class MainNode(LimbNode):
         return self
 
     @property
+    def main(self):
+        return self
+
+    @property
     def jnts(self):
-        return []
+        return self.ROOT.connections()
 
     @property
     def main_ctrl(self):
@@ -619,7 +621,6 @@ class ClavicleNode(LimbNode):
 
         attr = self.mainAttr
         net = self.main.arms[attr.index()]
-        print net
 
         for obj in pymel.listTransforms():
             # Clavicle CTRLS
