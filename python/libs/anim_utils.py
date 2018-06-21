@@ -1,7 +1,33 @@
 import pymel.core as pymel
 import siteCustomize
 import os
+import json
+import logging
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+
+
 from python.libs import consts, virtual_classes
+
+
+def export_pose(region, pose_name):
+
+    dir_path = os.path.join(siteCustomize.ROOT_DIR, 'animations', 'poses', region)
+    json_path = os.path.join(dir_path, pose_name, 'new.json')
+
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    json_path = json_path.replace('\\', '/')
+    print json_path
+
+    pose_data = {'key': 'this'}
+
+    log.info('Exporting data in json file {}'.format(json_path))
+    with open(json_path, 'w') as pose_json:
+        json.dump(pose_data, pose_json, sort_keys=True, indent=4)
+    log.info('Json export done')
 
 
 def bake_anim(root):
@@ -33,6 +59,11 @@ def export_anim(root):
     pymel.mel.eval('FBXExport -f "{0}" -s'.format(path))
 
 if __name__ == '__main__':
+    #
+    # ctrl = pymel.selected()[0]
+    #
+    # export_pose(ctrl.region, pose_name='test')
+
 
     with pymel.UndoChunk():
         main = pymel.PyNode('Main_Net')
