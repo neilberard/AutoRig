@@ -134,7 +134,10 @@ class BaseNode():
 
     @property
     def switch(self):
-        return self.network.SWITCH.connections()[0] # todo: This is busted since clavicle is overriding switch method, use self.network.switch for now
+        if self.network.SWITCH.connections():
+            return self.network.SWITCH.connections()[0] # todo: This is busted since clavicle is overriding switch method, use self.network.switch for now
+        else:
+            return None
 
     @property
     def ikHandlesAttr(self):
