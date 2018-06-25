@@ -460,7 +460,7 @@ def build_hand(jnts, net, ctrl_size=0.6):
 
         parent_name = naming_utils.concatenate([parent.side, parent.base_name, parent.joint_name, parent.info_index, 'CTRL'])
 
-        ctrl = build_ctrls.create_ctrl(jnt=jnt, network=net, size=ctrl_size, name=name)
+        ctrl = build_ctrls.create_ctrl(jnt=jnt, network=net, size=ctrl_size, name=name, attr=net.FK_CTRLS)
         ctrls.append(ctrl)
         pymel.parentConstraint([ctrl, jnt])
 
