@@ -38,24 +38,28 @@ def make_shape(shape_type='Circle', name='Placeholder', transform=None):
     :return: transform node of the shape.
     """
 
+
     for shape in shape_files:
         if shape_type + '.ma' == shape:
             shape_file = os.path.join(shapes_dir, shape)
 
             if transform:
                 transform_node = transform
-
             else:
                 transform_node = pymel.createNode('transform', name=name)
             with open(shape_file, 'r') as s:
                 mel_data = s.read().split(';')
                 for mel_command in mel_data:
                     if mel_command.find('setAttr ".cc" -type "nurbsCurve"') != -1:
+
                         shape = pymel.createNode('nurbsCurve', name=name + 'Shape', parent=transform_node)
+
                         pymel.mel.eval('setAttr -k off ".v";')
                         pymel.mel.eval(mel_command + ';')
+                        print ''
 
             # set_transform(transform_node, axis)
+
 
             return transform_node
     return None

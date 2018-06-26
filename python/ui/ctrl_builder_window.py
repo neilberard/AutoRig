@@ -44,18 +44,30 @@ class ControlBuilderWindow(QtWidgets.QMainWindow, FormClass):
         self.cb_shape.blockSignals(True)  # Block combobox from sending signals when updating index.
         self.cb_shape.insertItems(0, self.shape_list)
         self.cb_shape.blockSignals(False)
+        self.rot_matrix = None
+        self.old_value = 0.0
 
-        self.axis = 'x'  # Orientation of the controller
+        # self.axis = 'x'  # Orientation of the controller
+
+        self.sel_list = []
+        # Get sel list
         self.refresh()
+
+
 
     # @QtCore.Slot(): Decorator based on widget name that connects QT signal.
     def refresh(self, *args):
+        self.sel_list = pymel.selected()
+        #
+        # for sel in self.sel_list:
+        #     sel.set_shape(self.cb_shape.currentText())
+
         # Ctrl_builder class
-        self.ctrl_builder = build_ctrls.ControlBuilder(pymel.selected())
-        self.ctrl_builder.set_ctrl_types(self.cb_shape.currentText())
-        self.ctrl_builder.set_ctrl_matrices()
-        self.ctrl_builder.set_ctrl_axis(self.axis)
-        self.ctrl_builder.set_ctrl_sizes(self.sldr.value() * .01)
+        # self.ctrl_builder = build_ctrls.ControlBuilder(pymel.selected())
+        # self.ctrl_builder.set_ctrl_types(self.cb_shape.currentText())
+        # self.ctrl_builder.set_ctrl_matrices()
+        # self.ctrl_builder.set_ctrl_axis(self.axis)
+        # self.ctrl_builder.set_ctrl_sizes(self.sldr.value() * .01)
     @QtCore.Slot()
     def on_chk_parent_constraint_stateChanged(self):
         if self.chk_parent_constraint.checkState() == QtCore.Qt.CheckState.Checked:
@@ -66,29 +78,52 @@ class ControlBuilderWindow(QtWidgets.QMainWindow, FormClass):
     @QtCore.Slot()
     def on_btn_axis_x_clicked(self):
         self.axis = 'x'
-        self.ctrl_builder.set_ctrl_axis(self.axis) 
+        for obj in pymel.selected():
+            obj.set_axis('x')
+
+        # self.ctrl_builder.set_ctrl_axis(self.axis)
 
     @QtCore.Slot()
     def on_btn_axis_y_clicked(self):
         self.axis = 'y'
-        self.ctrl_builder.set_ctrl_axis(self.axis)
+        for obj in pymel.selected():
+            obj.set_axis('y')
+        # self.ctrl_builder.set_ctrl_axis(self.axis)
 
     @QtCore.Slot()
     def on_btn_axis_z_clicked(self):
         self.axis = 'z'
-        self.ctrl_builder.set_ctrl_axis(self.axis)
+        for obj in pymel.selected():
+            obj.set_axis('z')
 
     @QtCore.Slot()
     def on_sldr_valueChanged(self):
-        self.ctrl_builder.set_ctrl_sizes(self.sldr.value() * .01)
+
+        sldr_value = self.sldr.value() * .01
+
+        scale = sldr_value - self.old_value + 1.0
+
+        for sel in pymel.selected():
+            for shape in sel.getShapes():
+                pymel.scale(shape.cv[:], (scale, scale, scale))
+
+        self.old_value = sldr_value
+
 
     @QtCore.Slot()
     def on_cb_shape_currentIndexChanged(self):
-        self.ctrl_builder.set_ctrl_types(self.cb_shape.currentText())
+        self.sldr.setValue(100)
+        for sel in pymel.selected():
+            try:
+                sel.set_shape(self.cb_shape.currentText())
+            except:
+                pass
+
+        # self.ctrl_builder.set_ctrl_types(self.cb_shape.currentText())
 
     @QtCore.Slot()
     def on_btn_cancel_clicked(self):
-        self.ctrl_builder.delete_ctrls()
+        # self.ctrl_builder.delete_ctrls()
         self.close()
 
     @QtCore.Slot()

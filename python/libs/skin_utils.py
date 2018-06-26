@@ -10,6 +10,11 @@ def skin_mesh(meshes, main_node):
     :param main_node: Main network node.
     :return:
     """
+    try:
+        pymel.skinCluster(meshes, edit=True, unbind=True)
+    except:
+        pass
+
 
     xml = 'body_skin_weights.xml'
 

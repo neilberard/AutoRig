@@ -301,7 +301,7 @@ class TransformNode(BaseNode, pymel.nodetypes.Transform):
         newNode._class.set('_TransformNode')
 
 
-class CtrlNode(pymel.nodetypes.Transform, BaseNode):
+class CtrlNode(TransformNode):
 
     @classmethod
     def list(cls, *args, **kwargs):
@@ -340,18 +340,50 @@ class CtrlNode(pymel.nodetypes.Transform, BaseNode):
         pymel.makeIdentity(self, a=True, t=1, r=1, s=1, n=0, pn=1)
 
     def set_shape(self, shape):
-        pymel.delete(self.getShape())
-        shapes.make_shape(shape_type=shape, transform=self)
+        pymel.scriptEditorInfo(suppressWarnings=True)
+        pymel.delete(self.getShapes())
+        shapes.make_shape(shape_type=shape, transform=self, name=shape)
+
+        pymel.scriptEditorInfo(suppressWarnings=False)  # Todo: Seeing odd warning from pymel with mfn
+
 
     def set_axis(self, axis):
+
+
+
+        x_matrix = pymel.datatypes.Matrix([0.0, -1.0, 0.0, 0.0],
+                                          [1.0, 0.0, 0.0, 0.0],
+                                          [0.0, 0.0, 1.0, 0.0],
+                                          [0.0, 0.0, 0.0, 1.0])
+
+        y_matrix = pymel.datatypes.Matrix([1.0, 0.0, 0.0, 0.0],
+                                          [0.0, 1.0, 0.0, 0.0],
+                                          [0.0, 0.0, 1.0, 0.0],
+                                          [0.0, 0.0, 0.0, 1.0])
+
+        z_matrix = pymel.datatypes.Matrix([1.0, 0.0, 0.0, 0.0],
+                                          [0.0, 0.0, 1.0, 0.0],
+                                          [0.0, -1.0, 0.0, 0.0],
+                                          [0.0, 0.0, 0.0, 1.0])
+
         if axis == 'x':
-            self.setRotation((90, 0, 0))
+            for shape in self.getShapes():
+                for cv in shape.cv[:]:
+                    cv.setPosition(cv.getPosition() * x_matrix)
+                # self.setRotation((90, 0, 0))
 
         if axis == 'y':
-            self.setRotation((0, 0, 0))
+            for shape in self.getShapes():
+                for cv in shape.cv[:]:
+                    cv.setPosition(cv.getPosition() * y_matrix)
+            # self.setRotation((0, 0, 0))
 
         if axis == 'z':
-            self.setRotation((0, 0, 90))
+            for shape in self.getShapes():
+                for cv in shape.cv[:]:
+                    cv.setPosition(cv.getPosition() * z_matrix)
+
+        pymel.ogs(reset=True)
 
     def create_offset(self):
         grp = pymel.group(empty=True)

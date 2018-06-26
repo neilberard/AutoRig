@@ -131,7 +131,7 @@ def build_ikfk_limb(jnts, net, fk_size=2.0, fk_shape='Circle', ik_size=1.0, ik_s
                                               'CTRL'])
         ctrl_tags = {'Utility': 'FK', 'Axis': 'XY'}  # todo: add support for alternate mirror axis
         if idx <= 3:
-            ctrl = build_ctrls.create_ctrl(jnt=fk_jnt, name=ctrl_name, network=net, attr=net.FK_CTRLS, tags=ctrl_tags, size=size, shape=fk_shape, axis='z')
+            ctrl = build_ctrls.create_ctrl(jnt=fk_jnt, name=ctrl_name, network=net, attr=net.FK_CTRLS, tags=ctrl_tags, size=size, shape=fk_shape, axis='x')
 
     for idx, fk in enumerate(net.fk_ctrls):
         if idx > 0:
@@ -436,11 +436,11 @@ def build_head(jnts, net):
         info = naming_utils.ItemInfo(jnt)
 
         if info.joint_name == 'Head':
-            head_ctrl = build_ctrls.create_ctrl(jnt, shape='Head01', size=1, attr=net.FK_CTRLS, network=net, axis='Y')
+            head_ctrl = build_ctrls.create_ctrl(jnt, shape='Head01', size=1, attr=net.FK_CTRLS, network=net, axis='y')
             pymel.parentConstraint([head_ctrl, jnt])
 
         elif info.joint_name == 'Neck':
-            neck_ctrl = build_ctrls.create_ctrl(jnt, name=naming_utils.concatenate([info.joint_name, 'CTRL']), size=2.0, attr=net.FK_CTRLS, network=net, axis='Y', shape='Neck01')
+            neck_ctrl = build_ctrls.create_ctrl(jnt, name=naming_utils.concatenate([info.joint_name, 'CTRL']), size=2.0, attr=net.FK_CTRLS, network=net, axis='y', shape='Neck01')
             pymel.parentConstraint([neck_ctrl, jnt])
 
     head_ctrl.setParent(neck_ctrl)
@@ -460,7 +460,7 @@ def build_hand(jnts, net, ctrl_size=0.6):
 
         parent_name = naming_utils.concatenate([parent.side, parent.base_name, parent.joint_name, parent.info_index, 'CTRL'])
 
-        ctrl = build_ctrls.create_ctrl(jnt=jnt, network=net, size=ctrl_size, name=name, attr=net.FK_CTRLS)
+        ctrl = build_ctrls.create_ctrl(jnt=jnt, network=net, size=ctrl_size, name=name, attr=net.FK_CTRLS, axis='x')
         ctrls.append(ctrl)
         pymel.parentConstraint([ctrl, jnt])
 

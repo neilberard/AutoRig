@@ -11,7 +11,7 @@ import pymel.core as pymel
 
 # Libs
 from python.interop.utils import attr_utils
-from python.libs import build_ctrls, joint_utils, pose_utils, ikfk_switch, skin_utils
+from python.libs import build_ctrls, joint_utils, pose_utils, ikfk_switch, skin_utils, anim_utils
 from python.ui import ctrl_builder_window
 from python.modules import build_rig
 
@@ -24,6 +24,7 @@ reload(build_ctrls)
 reload(joint_utils)
 reload(pose_utils)
 reload(skin_utils)
+reload(anim_utils)
 
 
 log = logging.getLogger(__name__)
@@ -175,6 +176,21 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
         main_net = pymel.PyNode('Main_Net')
         skin_utils.clear_animation(main_net)
         pose_utils.reset_rig()
+
+    @QtCore.Slot()
+    def on_btn_anim_export_clicked(self):
+        log.info('on_btn_anim_export_clicked')
+        main_net = pymel.PyNode('Main_Net')
+
+        with pymel.UndoChunk():
+            main = pymel.PyNode('Main_Net')
+            root = main.jnts[0]
+            anim_utils.bake_anim(root)
+            anim_utils.export_anim(root)
+
+        pymel.undo()
+
+
 
     @QtCore.Slot()
     def on_btn_clear_anim_sel_clicked(self):
