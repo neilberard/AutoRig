@@ -96,10 +96,15 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     def on_btn_build_humanoid_clicked(self):
         log.info('on_btn_build_humanoid_clicked')
 
+        start_time = pymel.timerX()
+
         self.progress_bar = QtWidgets.QProgressBar(self)
         self.pb_main.setValue(0)
         self.pb_main.show()
-        build_rig.build_humanoid_rig(self.pb_main, mirror=False)
+        with pymel.UndoChunk():
+            build_rig.build_humanoid_rig(self.pb_main, mirror=False)
+
+        log.info('Duration = {} seconds'.format(pymel.timerX(st=start_time)))
 
 
     @QtCore.Slot()

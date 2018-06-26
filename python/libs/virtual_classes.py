@@ -1,4 +1,5 @@
 import pymel.all as pymel
+import maya.cmds as cmds
 from python.libs import naming_utils
 from python.libs import joint_utils
 from python.libs import shapes
@@ -176,10 +177,13 @@ class BaseNode():
 
     @property
     def limb_grp(self):
-        for obj in pymel.ls():
-            if obj.hasAttr('Network') and obj.Network.get() == self.network.name() and obj.hasAttr(
-                    'Utility') and obj.Utility.get() == 'LimbGrp':
-                return obj
+        # Using mel to speed up the code
+        for obj in cmds.ls(type='transform'):
+            if cmds.attributeQuery('Utility', node=obj, exists=True) and\
+                    cmds.getAttr('{}.Utility'.format(obj)) == 'LimbGrp' and\
+                    cmds.attributeQuery('Network', node=obj, exists=True) and\
+                    cmds.getAttr('{}.Network'.format(obj)) == self.network.name():
+                return pymel.PyNode(obj)
 
     def add_network_tag(self):
         self.add_tags({'Network': self.network.name()})
@@ -198,9 +202,11 @@ class BaseNode():
 
         nodes = []
 
-        for obj in pymel.ls():
-            if obj.hasAttr('Network') and obj.Network.get() == self.network.name() and obj not in self.jnts:
-                nodes.append(obj)
+        for obj in cmds.ls(type='transform'):
+            if cmds.attributeQuery('Network', node=obj, exists=True) and\
+               cmds.getAttr('{}.Network'.format(obj)) == self.network.name() and obj not in self.jnts:
+                nodes.append(pymel.PyNode(obj))
+
         return nodes
 
     def getMirroredCtrl(self):
@@ -214,15 +220,7 @@ class BaseNode():
                 return mirror_array[net_attr.index()]
 
     def getAllCtrls(self):
-
         return self.network.getAllCtrls()
-        # ctrl_list = set()
-        #
-        # for obj in pymel.listTransforms():
-        #     if obj.hasAttr('Type') and obj.Type.get() == 'CTRL' and obj.hasAttr('Network') and obj.Network.get() == self.network.name():
-        #         ctrl_list.add(obj)
-        #
-        # return list(ctrl_list)
 
 
 # DAG CLASSES
@@ -340,12 +338,8 @@ class CtrlNode(TransformNode):
         pymel.makeIdentity(self, a=True, t=1, r=1, s=1, n=0, pn=1)
 
     def set_shape(self, shape):
-        pymel.scriptEditorInfo(suppressWarnings=True)
         pymel.delete(self.getShapes())
         shapes.make_shape(shape_type=shape, transform=self, name=shape)
-
-        pymel.scriptEditorInfo(suppressWarnings=False)  # Todo: Seeing odd warning from pymel with mfn
-
 
     def set_axis(self, axis):
 
