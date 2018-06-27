@@ -109,6 +109,16 @@ class ControlBuilderWindow(QtWidgets.QMainWindow, FormClass):
 
         self.old_value = sldr_value
 
+    @QtCore.Slot()
+    def on_btn_color_clicked(self):
+        log.info('on_btn_color_clicked')
+        color_dialog = QtWidgets.QColorDialog()
+        c = color_dialog.getColor()
+
+        for obj in pymel.selected():
+            obj.overrideEnabled.set(1)
+            obj.overrideRGBColors.set(1)
+            obj.overrideColorRGB.set((c.red(), c.green(), c.blue(), c.alpha()))
 
     @QtCore.Slot()
     def on_cb_shape_currentIndexChanged(self):
