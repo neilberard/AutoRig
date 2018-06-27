@@ -87,10 +87,17 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
         pass
         # hs_clean.cleanup()
 
+    # @QtCore.Slot()
+    # def on_btn_make_switch_clicked(self):
+    #     with pymel.UndoChunk():
+    #         HS_IK.make_switch_utility(pymel.selected()[0])
+
+
     @QtCore.Slot()
-    def on_btn_make_switch_clicked(self):
-        with pymel.UndoChunk():
-            HS_IK.make_switch_utility(pymel.selected()[0])
+    def on_btn_import_joints_clicked(self):
+        log.info('on_btn_import_joints_clicked')
+        skin_utils.import_joints()
+
 
     @QtCore.Slot()
     def on_btn_build_humanoid_clicked(self):

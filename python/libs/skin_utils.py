@@ -51,6 +51,16 @@ def clear_animation(main_net):
     for ctrl in main_net.getAllCtrls():
         pymel.cutKey(ctrl, clear=True)
 
+def import_joints():
+    path = os.path.join(siteCustomize.ROOT_DIR, 'skin_data', 'jnts.fbx')
+    path = path.replace('\\', '/')
+
+    command = 'FBXImport -f "{}";'.format(path)
+    pymel.mel.eval(command)
+
+
+
+
 
 
 
