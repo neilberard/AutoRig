@@ -11,7 +11,7 @@ import pymel.core as pymel
 
 # Libs
 from python.interop.utils import attr_utils
-from python.libs import build_ctrls, joint_utils, pose_utils, ikfk_switch, skin_utils, anim_utils
+from python.libs import build_ctrls, joint_utils, pose_utils, ikfk_switch, skin_utils, anim_utils, virtual_classes
 from python.ui import ctrl_builder_window
 from python.modules import build_rig
 
@@ -50,7 +50,9 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     def setup_callbacks(self):
         self.remove_callbacks()
         self.events = [
-            OpenMaya.MEventMessage.addEventCallback('SelectionChanged', self.update_cb_ctrl_space)
+            OpenMaya.MEventMessage.addEventCallback('SelectionChanged', self.update_cb_ctrl_space),
+            OpenMaya.MEventMessage.addEventCallback('SelectionChanged', self.mirror_select),
+            OpenMaya.MEventMessage.addEventCallback('SelectionChanged', self.limb_select)
         ]
     def remove_callbacks(self):
         for callback in self.events:
@@ -139,8 +141,8 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     @QtCore.Slot()
     def on_btn_select_limb_clicked(self):
         log.info('on_btn_select_limb_clicked')
-        sel = pymel.selected()[0]
-        pymel.select(sel.getAllCtrls())
+        for obj in pymel.selected():
+            pymel.select(obj.getAllCtrls(), add=True)
 
     @QtCore.Slot()
     def on_btn_to_ik_clicked(self):
@@ -203,7 +205,6 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
         pymel.undo()
 
 
-
     @QtCore.Slot()
     def on_btn_clear_anim_sel_clicked(self):
         log.info('on_btn_clear_anim_sel_clicked')
@@ -219,7 +220,6 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     def on_cb_space_currentIndexChanged(self):
         if pymel.selected():
             sel = pymel.selected()
-            print self.cb_space.currentIndex()
 
             matrices = [x.getMatrix(worldSpace=True) for x in sel]
 
@@ -235,23 +235,40 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
                 except:
                     pass
 
-        print 'Changed!'
-
     def update_cb_ctrl_space(self, *args, **kwargs):
         self.cb_space.blockSignals(True)
-
         self.cb_space.clear()
-
         sel = pymel.selected()
 
         if sel:
             main_sel = sel[-1]
-            if main_sel.hasAttr('Space'):
-                self.cb_space.addItems(main_sel.Space.getEnums().keys())
-                index = self.cb_space.findText(main_sel.Space.get(asString=True), QtCore.Qt.MatchFixedString)
-                self.cb_space.setCurrentIndex(index)
+            if type(main_sel) == virtual_classes.CtrlNode:
+                if main_sel.hasAttr('Space'):
+                    self.cb_space.addItems(main_sel.Space.getEnums().keys())
+                    index = self.cb_space.findText(main_sel.Space.get(asString=True), QtCore.Qt.MatchFixedString)
+                    self.cb_space.setCurrentIndex(index)
 
         self.cb_space.blockSignals(False)
+
+    def mirror_select(self, *args, **kwargs):
+        sel = pymel.selected()
+
+        if sel:
+            main_sel = sel[-1]
+            if type(main_sel) == virtual_classes.CtrlNode and self.chk_mirror_select.isChecked():
+                self.remove_callbacks()
+                pymel.select(main_sel.getMirroredCtrl(), add=True)
+                self.setup_callbacks()
+
+    def limb_select(self, *args, **kwargs):
+        sel = pymel.selected()
+
+        if sel:
+            main_sel = sel[-1]
+            if type(main_sel) == virtual_classes.CtrlNode and self.chk_limb_select.isChecked():
+                self.remove_callbacks()
+                pymel.select(main_sel.getAllCtrls(), add=True)
+                self.setup_callbacks()
 
 
     @QtCore.Slot()

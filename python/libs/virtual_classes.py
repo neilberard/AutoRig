@@ -78,12 +78,15 @@ class BaseNode():
 
     @property
     def mainAttr(self):
-        for obj in self.network.message.connections(plugs=True):
-            if obj.node().hasAttr('_class'):
-                return obj
 
+        try:
+            for obj in self.network.message.connections(plugs=True):
+                if obj.node().hasAttr('_class'):
+                    return obj
+            return self.network.message.connections(plugs=True)[0]
 
-        return self.network.message.connections(plugs=True)[0]
+        except:
+            return None
 
     @property
     def jnts(self):
@@ -210,11 +213,23 @@ class BaseNode():
         return nodes
 
     def getMirroredCtrl(self):
-        net_attr = self.networkAttr  # Storing the network attr
+        """
+        Find the Limb network connection to Main Net and traverse the mirrored network
+        which is connected to another index, either 0 or 1.
+
+        For example: L_Elbow_FK_CTRL  >>> L_ARM_Net.FK_CTLS[2] >>> MAIN_NET.ARMS[ idx ]
+        Traverse: MAIN_NET.ARMS[ !idx ] >>> R_ARM_Net.FK_CTLS[2] >>> R_Elbow_FK_CTRL
+
+        :return: Mirrored CTRL or None if failed to find ctrl.
+        """
+
+        net_attr = self.networkAttr  # Storing the network attr'
         limb = self.mainAttr  # Storing the main limb attr
 
+        if not limb:  # If the network is not a limb, like 'Main', There is mo mirrored ctrl.
+            return None
         for idx, element in enumerate(limb.array().elements()):
-            if idx != limb.index():  # Traverse through the other limb network
+            if idx != limb.index():  # Traverse through the other idx connection limb network
                 mirror_net = limb.array().elementByLogicalIndex(idx).connections()[0]
                 mirror_array = mirror_net.getAttr(net_attr.array().attrName())
                 return mirror_array[net_attr.index()]
@@ -438,14 +453,16 @@ class LimbNode(pymel.nt.Network, BaseNode):
         return self
 
     def getAllCtrls(self):
-        ctrl_list = set()
+        nodes = []
 
-        for obj in pymel.listTransforms():
-            if obj.hasAttr('Type') and obj.Type.get() == 'CTRL' and obj.hasAttr('Network') and obj.Network.get() == self.network.name():
-                ctrl_list.add(obj)
+        for obj in cmds.ls(type='transform'):
+            if cmds.attributeQuery('Network', node=obj, exists=True) and\
+               cmds.getAttr('{}.Network'.format(obj)) == self.network.name() and \
+               cmds.attributeQuery('Type', node=obj, exists=True) and \
+               cmds.getAttr('{}.Type'.format(obj)) == 'CTRL':
+                nodes.append(pymel.PyNode(obj))
 
-        return list(ctrl_list)
-
+        return nodes
 
 class SplineIKNet(LimbNode):
     """ this is an example of how to create your own subdivisions of existing nodes. """
@@ -563,6 +580,10 @@ class MainNode(LimbNode):
     def main_ctrl(self):
         return self.MAIN_CTRL.connections()
 
+    # @property
+    # def mainAttr(self):
+    #     return None
+
     @property
     def arms(self):
         return self.ARMS.connections()
@@ -586,15 +607,6 @@ class MainNode(LimbNode):
     @property
     def hands(self):
         return self.HANDS.connections()
-
-    def getAllCtrls(self):
-        ctrl_set = set()
-
-        for obj in pymel.listTransforms():
-            if obj.hasAttr('Type') and obj.Type.get() == 'CTRL':
-                ctrl_set.add(obj)
-
-        return list(ctrl_set)
 
 
 class ClavicleNode(LimbNode):
