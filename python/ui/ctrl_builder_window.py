@@ -9,6 +9,7 @@ import maya.OpenMaya as OpenMaya
 import os
 import logging
 import pymel.core as pymel
+import maya.cmds as cmds
 from python.libs import build_ctrls, shapes
 
 reload(build_ctrls)
@@ -34,7 +35,7 @@ class ControlBuilderWindow(QtWidgets.QMainWindow, FormClass):
         except:
             pass
         super(ControlBuilderWindow, self).__init__(maya_main)  # PARENT WINDOW
-        self.callback_events = []
+        self.events = []
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)  # DELETE WINDOW ON CLOSE
         self.setupUi(self)
         self.setWindowTitle(type(self).__name__)
@@ -45,33 +46,41 @@ class ControlBuilderWindow(QtWidgets.QMainWindow, FormClass):
         self.cb_shape.insertItems(0, self.shape_list)
         self.cb_shape.blockSignals(False)
         self.rot_matrix = None
-        self.old_value = 0.0
+        self.old_value = 1.0
 
         # self.axis = 'x'  # Orientation of the controller
 
         self.sel_list = []
+
+        self.setup_callbacks()
         # Get sel list
         self.refresh()
 
+    def setup_callbacks(self):
+        self.remove_callbacks()
+        self.events = [
+                        OpenMaya.MEventMessage.addEventCallback('SelectionChanged', self.refresh)
+                      ]
 
+    def remove_callbacks(self):
+        for callback in self.events:
+            try:
+                OpenMaya.MEventMessage.removeCallback(callback)
+            except:
+                pass
 
-    # @QtCore.Slot(): Decorator based on widget name that connects QT signal.
-    def refresh(self, *args):
+    def refresh(self, *args, **kwargs):
         self.sel_list = pymel.selected()
-
-    @QtCore.Slot()
-    def on_chk_parent_constraint_stateChanged(self):
-        pass
-        # if self.chk_parent_constraint.checkState() == QtCore.Qt.CheckState.Checked:
-        #     self.ctrl_builder.parent_constraint = True
-        # else:
-        #     self.ctrl_builder.parent_constraint = False
+        self.old_value = 1.0
+        self.sldr.setValue(100)
 
     @QtCore.Slot()
     def on_btn_axis_x_clicked(self):
         self.axis = 'x'
         for obj in pymel.selected():
-            obj.set_axis('x')
+            obj.reset_axis()
+            obj.set_axis('X')
+
 
         # self.ctrl_builder.set_ctrl_axis(self.axis)
 
@@ -79,27 +88,43 @@ class ControlBuilderWindow(QtWidgets.QMainWindow, FormClass):
     def on_btn_axis_y_clicked(self):
         self.axis = 'y'
         for obj in pymel.selected():
-            obj.set_axis('y')
+            obj.reset_axis()
+            obj.set_axis('Y')
         # self.ctrl_builder.set_ctrl_axis(self.axis)
 
     @QtCore.Slot()
     def on_btn_axis_z_clicked(self):
         self.axis = 'z'
         for obj in pymel.selected():
-            obj.set_axis('z')
+            obj.reset_axis()
+            obj.set_axis('Z')
+
+    @QtCore.Slot()
+    def on_btn_reset_clicked(self):
+        # self.refresh()
+        self.sldr.setValue(100)
 
     @QtCore.Slot()
     def on_sldr_valueChanged(self):
 
         sldr_value = self.sldr.value() * .01
 
-        scale = sldr_value - self.old_value + 1.0
+        # scale = (sldr_value - self.old_value) + 1.0
 
-        for sel in pymel.selected():
-            for shape in sel.getShapes():
-                pymel.scale(shape.cv[:], (scale, scale, scale))
+        if sldr_value > 0.0:
+            scale = (sldr_value / self.old_value)
 
-        self.old_value = sldr_value
+            for sel in self.sel_list:
+
+                sel.shapeSize.set(sel.shapeSize.get() + (sldr_value - self.old_value))
+
+                sel.set_shape_size(scale)
+
+                # for shape in sel.getShapes():
+                #     pymel.scale(shape.cv[:], (scale, scale, scale))
+
+            self.old_value = sldr_value
+
 
     @QtCore.Slot()
     def on_btn_color_clicked(self):
@@ -107,21 +132,25 @@ class ControlBuilderWindow(QtWidgets.QMainWindow, FormClass):
         color_dialog = QtWidgets.QColorDialog()
         c = color_dialog.getColor()
 
+        multi = 1.0/255.0  # Normalize Color values
+
+        color = (c.red() * multi, c.green() * multi, c.blue() * multi, c.alpha() * multi)
+        print color
+
         for obj in pymel.selected():
-
-            shapes = obj.getShapes()
-
-            for shape in shapes:
-                shape.overrideEnabled.set(1)
-                shape.overrideRGBColors.set(1)
-                shape.overrideColorRGB.set((c.red(), c.green(), c.blue(), c.alpha()))
+            obj.set_shape_color(color)
 
     @QtCore.Slot()
     def on_cb_shape_currentIndexChanged(self):
         self.sldr.setValue(100)
         for sel in pymel.selected():
             try:
+                shape = sel.getShape()
+                color = shape.overrideColorRGB.get()
                 sel.set_shape(self.cb_shape.currentText())
+                sel.set_shape_color(color)
+                sel.set_axis(sel.shapeAxis.get())
+                sel.set_shape_size(sel.shapeSize.get())
             except:
                 pass
 
@@ -141,6 +170,7 @@ class ControlBuilderWindow(QtWidgets.QMainWindow, FormClass):
     @QtCore.Slot()
     def closeEvent(self, *args):
         log.info('closing')
+        self.remove_callbacks()
         # self.ctrl_builder.delete_ctrls()
 
 

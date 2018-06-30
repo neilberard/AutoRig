@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CtrlBuilder</class>
- <widget class="QMainWindow" name="CtrlBuilder">
+ <class>chk_negative_axis</class>
+ <widget class="QMainWindow" name="chk_negative_axis">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>314</width>
-    <height>331</height>
+    <height>312</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -153,6 +153,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBox">
+         <property name="text">
+          <string>Negative</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="horizontalSpacer_2">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -183,7 +190,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_5">
        <item>
-        <widget class="QPushButton" name="btn_execute">
+        <widget class="QPushButton" name="btn_reset">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -197,7 +204,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Execute</string>
+          <string>Reset</string>
          </property>
         </widget>
        </item>

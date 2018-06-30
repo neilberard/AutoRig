@@ -363,7 +363,40 @@ class CtrlNode(TransformNode):
         pymel.delete(self.getShapes())
         shapes.make_shape(shape_type=shape, transform=self, name=shape)
 
+    def set_shape_size(self, size):
+        for shape in self.getShapes():
+            pymel.scale(shape.cv[:], (size, size, size))
+
+    def set_shape_color(self, color):
+        shapes = self.getShapes()
+
+        for shape in shapes:
+            shape.overrideEnabled.set(1)
+            shape.overrideRGBColors.set(1)
+            shape.overrideColorRGB.set(color)
+
+    def reset_axis(self):
+        if self.shapeAxis.get() == 'X':
+            self.set_axis('X')
+
+        if self.shapeAxis.get() == 'Z':
+            self.set_axis('Z')
+
+        if self.shapeAxis.get() == 'Y':
+            self.set_axis('Y')
+
+        if self.shapeAxis.get() == '-X':
+            self.set_axis('-X')
+
+        if self.shapeAxis.get() == '-Z':
+            self.set_axis('-Z')
+
+        if self.shapeAxis.get() == '-Y':
+            self.set_axis('-Y')
+
+
     def set_axis(self, axis):
+
         with pymel.UndoChunk():
             x_matrix = pymel.datatypes.Matrix([0.0, -1.0, 0.0, 0.0],
                                               [1.0, 0.0, 0.0, 0.0],
@@ -424,6 +457,8 @@ class CtrlNode(TransformNode):
                 for shape in self.getShapes():
                     for cv in shape.cv[:]:
                         cv.setPosition(cv.getPosition() * neg_z_matrix)
+
+            self.shapeAxis.set(axis)
 
             pymel.ogs(reset=True)
 
