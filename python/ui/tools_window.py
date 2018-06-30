@@ -142,7 +142,7 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
     def on_btn_select_limb_clicked(self):
         log.info('on_btn_select_limb_clicked')
         for obj in pymel.selected():
-            pymel.select(obj.getAllCtrls(), add=True)
+            pymel.select(obj.getLimbCtrls(), add=True)
 
     @QtCore.Slot()
     def on_btn_to_ik_clicked(self):
@@ -257,7 +257,8 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
             main_sel = sel[-1]
             if type(main_sel) == virtual_classes.CtrlNode and self.chk_mirror_select.isChecked():
                 self.remove_callbacks()
-                pymel.select(main_sel.getMirroredCtrl(), add=True)
+                pymel.select(main_sel.getMirroredCtrl(), add=False)
+                pymel.select(main_sel, add=True)
                 self.setup_callbacks()
 
     def limb_select(self, *args, **kwargs):
@@ -267,7 +268,7 @@ class ToolsWindow(QtWidgets.QMainWindow, FormClass):
             main_sel = sel[-1]
             if type(main_sel) == virtual_classes.CtrlNode and self.chk_limb_select.isChecked():
                 self.remove_callbacks()
-                pymel.select(main_sel.getAllCtrls(), add=True)
+                pymel.select(main_sel.getLimbCtrls(), add=True)
                 self.setup_callbacks()
 
 

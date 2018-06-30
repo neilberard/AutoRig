@@ -18,12 +18,27 @@ def create_ctrl(jnt=None,
                 network=None,
                 attr=None,
                 tags=None,
-                axis='z',
+                axis=None,
                 shape='Circle',
                 size=1.0,
                 name=None,
                 offset=False,
                 mirrored=False):
+
+    """
+
+    :param jnt: This will set ctrl orientation to jnt specified.
+    :param network: This will add a tag for network specified.
+    :param attr: This will connect the ctrl message to the net attr specified.
+    :param tags:
+    :param axis: This will rotate the ctrl shape by 90 or -90 degrees based on axis, ie '-z', 'x'
+    :param shape: Shape to import based on file name, ie "Cube01"
+    :param size:
+    :param name:
+    :param offset: Create an Offset Group for the ctrl
+    :param mirrored: Scale by -X
+    :return: Ctrl Node.
+    """
 
     if not name and jnt:
         info = naming_utils.ItemInfo(jnt)
@@ -35,10 +50,9 @@ def create_ctrl(jnt=None,
     ctrl = virtual_classes.CtrlNode()
     pymel.rename(ctrl, name)
     ctrl.set_shape(shape)
-    ctrl.set_axis(axis)
 
     if mirrored:
-        ctrl.setScale((-1, -1, 1))
+        ctrl.setScale((-1, 1, 1))
     ctrl.freeze_transform()
 
     if tags:
@@ -62,6 +76,9 @@ def create_ctrl(jnt=None,
     if attr:
         idx = attr.getNumElements()
         ctrl.message.connect(attr[idx])
+
+    if axis:
+        ctrl.set_axis(axis)
 
     return ctrl
 

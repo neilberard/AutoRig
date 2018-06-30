@@ -58,22 +58,14 @@ class ControlBuilderWindow(QtWidgets.QMainWindow, FormClass):
     # @QtCore.Slot(): Decorator based on widget name that connects QT signal.
     def refresh(self, *args):
         self.sel_list = pymel.selected()
-        #
-        # for sel in self.sel_list:
-        #     sel.set_shape(self.cb_shape.currentText())
 
-        # Ctrl_builder class
-        # self.ctrl_builder = build_ctrls.ControlBuilder(pymel.selected())
-        # self.ctrl_builder.set_ctrl_types(self.cb_shape.currentText())
-        # self.ctrl_builder.set_ctrl_matrices()
-        # self.ctrl_builder.set_ctrl_axis(self.axis)
-        # self.ctrl_builder.set_ctrl_sizes(self.sldr.value() * .01)
     @QtCore.Slot()
     def on_chk_parent_constraint_stateChanged(self):
-        if self.chk_parent_constraint.checkState() == QtCore.Qt.CheckState.Checked:
-            self.ctrl_builder.parent_constraint = True
-        else:
-            self.ctrl_builder.parent_constraint = False
+        pass
+        # if self.chk_parent_constraint.checkState() == QtCore.Qt.CheckState.Checked:
+        #     self.ctrl_builder.parent_constraint = True
+        # else:
+        #     self.ctrl_builder.parent_constraint = False
 
     @QtCore.Slot()
     def on_btn_axis_x_clicked(self):
@@ -116,9 +108,13 @@ class ControlBuilderWindow(QtWidgets.QMainWindow, FormClass):
         c = color_dialog.getColor()
 
         for obj in pymel.selected():
-            obj.overrideEnabled.set(1)
-            obj.overrideRGBColors.set(1)
-            obj.overrideColorRGB.set((c.red(), c.green(), c.blue(), c.alpha()))
+
+            shapes = obj.getShapes()
+
+            for shape in shapes:
+                shape.overrideEnabled.set(1)
+                shape.overrideRGBColors.set(1)
+                shape.overrideColorRGB.set((c.red(), c.green(), c.blue(), c.alpha()))
 
     @QtCore.Slot()
     def on_cb_shape_currentIndexChanged(self):
@@ -139,13 +135,13 @@ class ControlBuilderWindow(QtWidgets.QMainWindow, FormClass):
     @QtCore.Slot()
     def on_btn_execute_clicked(self):
         log.info('on_btn_execute_clicked')
-        self.ctrl_builder.ctrls = []
+        # self.ctrl_builder.ctrls = []
         self.close()
 
     @QtCore.Slot()
     def closeEvent(self, *args):
         log.info('closing')
-        self.ctrl_builder.delete_ctrls()
+        # self.ctrl_builder.delete_ctrls()
 
 
 def showUI():

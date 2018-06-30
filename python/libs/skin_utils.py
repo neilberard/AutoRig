@@ -38,7 +38,7 @@ def skin_mesh(meshes, main_node):
 
 
 def import_range_of_motion(main_net):
-    pymel.select(main_net.getAllCtrls())
+    pymel.select(main_net.getLimbCtrls())
 
     path = os.path.join(siteCustomize.ROOT_DIR, 'animations', 'rom.atom')
     try:
@@ -48,7 +48,7 @@ def import_range_of_motion(main_net):
         pass
 
 def clear_animation(main_net):
-    for ctrl in main_net.getAllCtrls():
+    for ctrl in main_net.getLimbCtrls():
         pymel.cutKey(ctrl, clear=True)
 
 def import_joints():

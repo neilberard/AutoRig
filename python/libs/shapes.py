@@ -65,19 +65,3 @@ def make_shape(shape_type='Circle', name='Placeholder', transform=None):
     return None
 
 
-def set_transform(ctrl, axis):
-
-    if axis == 'x':
-        ctrl.setRotation((90, 0, 0))
-
-    if axis == 'y':
-        ctrl.setRotation((0, 0, 0))
-
-    if axis == 'z':
-        ctrl.setRotation((0, 0, 90))
-
-    pymel.makeIdentity(ctrl, a=True, t=1, r=1, s=1, n=0, pn=1)
-    ctrl.scalePivot.translate.set(0, 0, 0)
-    ctrl.rotatePivot.translate.set(0, 0, 0)
-
-

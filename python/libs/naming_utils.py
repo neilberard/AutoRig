@@ -72,6 +72,10 @@ class ItemInfo(object):
             except:
                 pass
 
+        # If there is no side, setting side to Center
+        if not self.side:
+            self.side = 'Center'
+
 
 def concatenate(str_list):
     string = '_'.join([x for x in str_list if x])

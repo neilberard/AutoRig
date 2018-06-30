@@ -164,6 +164,13 @@ class BaseNode():
         return self.network.Region.get()
 
     @property
+    def utility(self):
+        try:
+            return self.Utility.get()
+        except:
+            return None
+
+    @property
     def joint_name(self):
         info = naming_utils.ItemInfo(self.name())
         return info.joint_name
@@ -234,8 +241,8 @@ class BaseNode():
                 mirror_array = mirror_net.getAttr(net_attr.array().attrName())
                 return mirror_array[net_attr.index()]
 
-    def getAllCtrls(self):
-        return self.network.getAllCtrls()
+    def getLimbCtrls(self):
+        return self.network.getLimbCtrls()
 
 
 # DAG CLASSES
@@ -357,42 +364,68 @@ class CtrlNode(TransformNode):
         shapes.make_shape(shape_type=shape, transform=self, name=shape)
 
     def set_axis(self, axis):
+        with pymel.UndoChunk():
+            x_matrix = pymel.datatypes.Matrix([0.0, -1.0, 0.0, 0.0],
+                                              [1.0, 0.0, 0.0, 0.0],
+                                              [0.0, 0.0, 1.0, 0.0],
+                                              [0.0, 0.0, 0.0, 1.0])
 
+            neg_x_matrix = pymel.datatypes.Matrix([1.0, 0.0, 0.0, 0.0],
+                                                  [0.0, 0.0, -1.0, 0.0],
+                                                  [0.0, 1.0, 0.0, 0.0],
+                                                  [0.0, 0.0, 0.0, 1.0])
 
+            y_matrix = pymel.datatypes.Matrix([0.0, 0.0, -1.0, 0.0],
+                                              [0.0, 1.0, 0.0, 0.0],
+                                              [1.0, 0.0, 0.0, 0.0],
+                                              [0.0, 0.0, 0.0, 1.0])
 
-        x_matrix = pymel.datatypes.Matrix([0.0, -1.0, 0.0, 0.0],
-                                          [1.0, 0.0, 0.0, 0.0],
-                                          [0.0, 0.0, 1.0, 0.0],
-                                          [0.0, 0.0, 0.0, 1.0])
+            neg_y_matrix = pymel.datatypes.Matrix([0.0, 0.0, 1.0, 0.0],
+                                                  [0.0, 1.0, 0.0, 0.0],
+                                                  [-1.0, 0.0, 0.0, 0.0],
+                                                  [0.0, 0.0, 0.0, 1.0])
 
-        y_matrix = pymel.datatypes.Matrix([1.0, 0.0, 0.0, 0.0],
-                                          [0.0, 1.0, 0.0, 0.0],
-                                          [0.0, 0.0, 1.0, 0.0],
-                                          [0.0, 0.0, 0.0, 1.0])
+            z_matrix = pymel.datatypes.Matrix([1.0, 0.0, 0.0, 0.0],
+                                              [0.0, 0.0, 1.0, 0.0],
+                                              [0.0, -1.0, 0.0, 0.0],
+                                              [0.0, 0.0, 0.0, 1.0])
 
-        z_matrix = pymel.datatypes.Matrix([1.0, 0.0, 0.0, 0.0],
-                                          [0.0, 0.0, 1.0, 0.0],
-                                          [0.0, -1.0, 0.0, 0.0],
-                                          [0.0, 0.0, 0.0, 1.0])
+            neg_z_matrix = pymel.datatypes.Matrix([0.0, -1.0, 0.0, 0.0],
+                                                  [1.0, 0.0, 1.0, 0.0],
+                                                  [0.0, 0.0, 1.0, 0.0],
+                                                  [0.0, 0.0, 0.0, 1.0])
 
-        if axis == 'x':
-            for shape in self.getShapes():
-                for cv in shape.cv[:]:
-                    cv.setPosition(cv.getPosition() * x_matrix)
-                # self.setRotation((90, 0, 0))
+            if axis == 'x':
+                for shape in self.getShapes():
+                    for cv in shape.cv[:]:
+                        cv.setPosition(cv.getPosition() * x_matrix)
 
-        if axis == 'y':
-            for shape in self.getShapes():
-                for cv in shape.cv[:]:
-                    cv.setPosition(cv.getPosition() * y_matrix)
-            # self.setRotation((0, 0, 0))
+            if axis == '-x':
+                for shape in self.getShapes():
+                    for cv in shape.cv[:]:
+                        cv.setPosition(cv.getPosition() * neg_x_matrix)
 
-        if axis == 'z':
-            for shape in self.getShapes():
-                for cv in shape.cv[:]:
-                    cv.setPosition(cv.getPosition() * z_matrix)
+            if axis == 'y': # Default Y up
+                for shape in self.getShapes():
+                    for cv in shape.cv[:]:
+                        cv.setPosition(cv.getPosition() * y_matrix)
 
-        pymel.ogs(reset=True)
+            if axis == '-y': # Default Y up
+                for shape in self.getShapes():
+                    for cv in shape.cv[:]:
+                        cv.setPosition(cv.getPosition() * neg_y_matrix)
+
+            if axis == 'z':
+                for shape in self.getShapes():
+                    for cv in shape.cv[:]:
+                        cv.setPosition(cv.getPosition() * z_matrix)
+
+            if axis == '-z':
+                for shape in self.getShapes():
+                    for cv in shape.cv[:]:
+                        cv.setPosition(cv.getPosition() * neg_z_matrix)
+
+            pymel.ogs(reset=True)
 
     def create_offset(self):
         grp = pymel.group(empty=True)
@@ -452,7 +485,7 @@ class LimbNode(pymel.nt.Network, BaseNode):
     def network(self):
         return self
 
-    def getAllCtrls(self):
+    def getLimbCtrls(self):
         nodes = []
 
         for obj in cmds.ls(type='transform'):
@@ -463,6 +496,7 @@ class LimbNode(pymel.nt.Network, BaseNode):
                 nodes.append(pymel.PyNode(obj))
 
         return nodes
+
 
 class SplineIKNet(LimbNode):
     """ this is an example of how to create your own subdivisions of existing nodes. """
@@ -580,10 +614,6 @@ class MainNode(LimbNode):
     def main_ctrl(self):
         return self.MAIN_CTRL.connections()
 
-    # @property
-    # def mainAttr(self):
-    #     return None
-
     @property
     def arms(self):
         return self.ARMS.connections()
@@ -607,6 +637,15 @@ class MainNode(LimbNode):
     @property
     def hands(self):
         return self.HANDS.connections()
+
+    def getAllCtrls(self):  # todo: Add support for multiple rigs in a scene.
+
+        nodes = []
+
+        for obj in cmds.ls(type='transform'):
+            if cmds.attributeQuery('Type', node=obj, exists=True) and cmds.getAttr('{}.Type'.format(obj)) == 'CTRL':
+                nodes.append(pymel.PyNode(obj))
+        return nodes
 
 
 class ClavicleNode(LimbNode):
@@ -657,7 +696,7 @@ class ClavicleNode(LimbNode):
         except:
             log.warning('Failed to find IKFK, is this node hooked up to main?')
 
-    def getAllCtrls(self):
+    def getLimbCtrls(self):
         ctrl_list = set()
 
         attr = self.mainAttr

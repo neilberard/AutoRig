@@ -20,7 +20,7 @@ def reset_selected():
 @general_utils.undo
 def reset_limb():
     ctrl = pymel.selected()[0]
-    for obj in ctrl.getAllCtrls():
+    for obj in ctrl.getLimbCtrls():
         reset_ctrl(obj)
 
 def reset_ctrl(obj):

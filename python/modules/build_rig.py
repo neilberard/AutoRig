@@ -4,7 +4,7 @@ import pymel.core as pymel
 from python.libs import build_ctrls
 from python.libs import general_utils
 from python.libs import joint_utils
-from python.libs import naming_utils, virtual_classes, consts
+from python.libs import naming_utils, virtual_classes, consts, pose_utils
 
 reload(build_ctrls)
 reload(joint_utils)
@@ -12,6 +12,7 @@ reload(naming_utils)
 reload(general_utils)
 reload(virtual_classes)
 reload(consts)
+reload(pose_utils)
 
 import logging
 log = logging.getLogger(__name__)
@@ -43,7 +44,6 @@ def delete_rig():
         pymel.delete(['L_Clavicle', 'L_Hip'])
     except:
         pass
-
 
 
 def group_limb(net, name=None):
@@ -198,7 +198,7 @@ def build_ikfk_limb(jnts, net, fk_size=2.0, fk_shape='Circle', ik_size=1.0, ik_s
     # Switch CTRL
     switch_name = naming_utils.concatenate([net.jnts[2].name_info.base_name, net.jnts[2].name_info.joint_name, 'IKFK', 'CTRL'])
     switch_tags = {'Type': 'Switch', 'Utility': 'IKFK'}
-    switch = build_ctrls.create_ctrl(jnt=net.jnts[2], name=switch_name, network=net, attr=net.SWITCH, tags=switch_tags, shape=ikfk_shape, size=ikfk_size)
+    switch = build_ctrls.create_ctrl(jnt=net.jnts[2], name=switch_name, network=net, attr=net.SWITCH, tags=switch_tags, shape=ikfk_shape, size=ikfk_size, axis='x')
     switch_offset = joint_utils.create_offset_groups(switch)
     pymel.parentConstraint([jnts[2], switch_offset])
 
@@ -293,7 +293,7 @@ def build_spine(jnts, net, fk_size=2.0):
         name = naming_utils.concatenate([jnt.name_info.joint_name,
                                          jnt.name_info.index,
                                          'CTRL'])
-        ctrl = build_ctrls.create_ctrl(name=name, axis='y', shape=shape, network=net, attr=net.IK_CTRLS, offset=False, size=size)
+        ctrl = build_ctrls.create_ctrl(name=name, shape=shape, network=net, attr=net.IK_CTRLS, offset=False, size=size)
         ctrl.setTranslation(jnt.getTranslation(worldSpace=True))
 
         for cluster in children:
@@ -307,7 +307,7 @@ def build_spine(jnts, net, fk_size=2.0):
     # Chest CTRL
     chest_ctrl = make_ctrl(net.jnts[3], children=net.clusters[3:5], shape='Chest', size=1.0)
     # COG
-    cog = build_ctrls.create_ctrl(network=net, attr=net.COG, shape='Circle', size=5, name='COG', offset=False, axis='Y')
+    cog = build_ctrls.create_ctrl(network=net, attr=net.COG, shape='Circle', size=5, name='COG', offset=False, axis='y')
     cog.setTranslation(net.jnts[1].getTranslation(worldSpace=True))
 
     chest_ctrl.setParent(mid_ctrl)
@@ -414,9 +414,9 @@ def build_reverse_foot_rig(net):
 def build_clavicle(jnts, net):
 
     if net.side == 'L':
-        ctrl = build_ctrls.create_ctrl(jnt=jnts[0], network=net, attr=net.FK_CTRLS, shape='Clavicle', mirrored=True)
+        ctrl = build_ctrls.create_ctrl(jnt=jnts[0], network=net, attr=net.FK_CTRLS, shape='Clavicle', mirrored=True, axis='z')
     else:
-        ctrl = build_ctrls.create_ctrl(jnt=jnts[0], network=net, attr=net.FK_CTRLS, shape='Clavicle')
+        ctrl = build_ctrls.create_ctrl(jnt=jnts[0], network=net, attr=net.FK_CTRLS, shape='Clavicle', axis = '-x')  # todo: '-x' is really unintuitive, look into this further.
 
     offset = joint_utils.create_offset_groups(ctrl, net=net)
     naming_utils.add_tags(ctrl, {'Utility': 'FK', 'Axis': 'XY'})
@@ -432,11 +432,11 @@ def build_head(jnts, net):
         info = naming_utils.ItemInfo(jnt)
 
         if info.joint_name == 'Head':
-            head_ctrl = build_ctrls.create_ctrl(jnt, shape='Head01', size=1, attr=net.FK_CTRLS, network=net, axis='y')
+            head_ctrl = build_ctrls.create_ctrl(jnt, shape='Head01', size=1, attr=net.FK_CTRLS, network=net)
             pymel.parentConstraint([head_ctrl, jnt])
 
         elif info.joint_name == 'Neck':
-            neck_ctrl = build_ctrls.create_ctrl(jnt, name=naming_utils.concatenate([info.joint_name, 'CTRL']), size=2.0, attr=net.FK_CTRLS, network=net, axis='y', shape='Neck01')
+            neck_ctrl = build_ctrls.create_ctrl(jnt, name=naming_utils.concatenate([info.joint_name, 'CTRL']), size=2.0, attr=net.FK_CTRLS, network=net, shape='Neck01')
             pymel.parentConstraint([neck_ctrl, jnt])
 
     head_ctrl.setParent(neck_ctrl)
@@ -473,9 +473,9 @@ def build_main(net, ctrl_size=15):
     main_name = 'Main_CTRL'
     root_name = 'Root_CTRL'
     world_name = 'World_CTRL'
-    main_ctrl = build_ctrls.create_ctrl(name=main_name, shape='Arrows02', attr=net.MAIN_CTRL, size=ctrl_size, network=net, axis='y')
-    world_ctrl = build_ctrls.create_ctrl(name=world_name, attr=net.MAIN_CTRL, size=12, network=net, axis='y')
-    root_ctrl = build_ctrls.create_ctrl(name=root_name, shape='WorldPos01', attr=net.MAIN_CTRL, size=8, network=net, axis='y')
+    main_ctrl = build_ctrls.create_ctrl(name=main_name, shape='Arrows02', attr=net.MAIN_CTRL, size=ctrl_size, network=net)
+    world_ctrl = build_ctrls.create_ctrl(name=world_name, attr=net.MAIN_CTRL, size=12, network=net)
+    root_ctrl = build_ctrls.create_ctrl(name=root_name, shape='WorldPos01', attr=net.MAIN_CTRL, size=8, network=net)
     root_ctrl.setParent(world_ctrl)
     main_ctrl.setParent(world_ctrl)
 
@@ -791,6 +791,46 @@ def build_upper_limb_roll_jnts(main_net, roll_jnt_count=3):
         create_joints(main_net.legs[idx].jnts[0], main_net.legs[idx].jnts[1], main_net.legs[idx])
 
 
+def set_ctrl_colors(main_net, ctrls):
+
+    for ctrl in ctrls:
+
+        shapes = ctrl.getShapes()
+
+        for shape in shapes:
+            if ctrl.side == 'L':
+                shape.overrideRGBColors.set(1)
+                shape.overrideEnabled.set(1)
+                shape.overrideColorRGB.set((1.0, 0.0, 0.0))
+
+            if ctrl.side == 'R':
+                shape.overrideRGBColors.set(1)
+                shape.overrideEnabled.set(1)
+                shape.overrideColorRGB.set((0.0, 0.0, 1.0))
+
+            if ctrl.side == 'Center':
+                shape.overrideRGBColors.set(1)
+                shape.overrideEnabled.set(1)
+                shape.overrideColorRGB.set((1.0, 1.0, 0.0))
+
+
+def lock_ctrls(main_net, ctrls):
+
+    # Lock Scale
+    for ctrl in ctrls:
+        ctrl.setAttr('scaleX', lock=True, keyable=False, channelBox=False)
+        ctrl.setAttr('scaleY', lock=True, keyable=False, channelBox=False)
+        ctrl.setAttr('scaleZ', lock=True, keyable=False, channelBox=False)
+
+        # FK CTRLS Lock Translate
+        if ctrl.utility == 'FK':
+            ctrl.setAttr('translateX', lock=True, keyable=False, channelBox=False)
+            ctrl.setAttr('translateY', lock=True, keyable=False, channelBox=False)
+            ctrl.setAttr('translateZ', lock=True, keyable=False, channelBox=False)
+
+
+        pass
+
 def build_humanoid_rig(progress_bar, mirror=True):
     """
     This function requires all joints in the scene to belong to a single hierarchy.
@@ -1013,6 +1053,16 @@ def build_humanoid_rig(progress_bar, mirror=True):
     main_grp_name = 'Rig_GRP'
     main_grp = group_limb(main, name=main_grp_name)
     root.setParent(main_grp)
+
+    # Colors
+    ctrls = main.getAllCtrls()
+    set_ctrl_colors(main, ctrls)
+
+    # Lock Ctrls
+    lock_ctrls(main, ctrls)
+
+
+
 
 
 """TEST CODE"""
