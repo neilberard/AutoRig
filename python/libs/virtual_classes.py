@@ -395,32 +395,32 @@ class CtrlNode(TransformNode):
                                                   [0.0, 0.0, 1.0, 0.0],
                                                   [0.0, 0.0, 0.0, 1.0])
 
-            if axis == 'x':
+            if axis == 'X':
                 for shape in self.getShapes():
                     for cv in shape.cv[:]:
                         cv.setPosition(cv.getPosition() * x_matrix)
 
-            if axis == '-x':
+            if axis == '-X':
                 for shape in self.getShapes():
                     for cv in shape.cv[:]:
                         cv.setPosition(cv.getPosition() * neg_x_matrix)
 
-            if axis == 'y': # Default Y up
+            if axis == 'Y': # Default Y up
                 for shape in self.getShapes():
                     for cv in shape.cv[:]:
                         cv.setPosition(cv.getPosition() * y_matrix)
 
-            if axis == '-y': # Default Y up
+            if axis == '-Y': # Default Y up
                 for shape in self.getShapes():
                     for cv in shape.cv[:]:
                         cv.setPosition(cv.getPosition() * neg_y_matrix)
 
-            if axis == 'z':
+            if axis == 'Z':
                 for shape in self.getShapes():
                     for cv in shape.cv[:]:
                         cv.setPosition(cv.getPosition() * z_matrix)
 
-            if axis == '-z':
+            if axis == '-Z':
                 for shape in self.getShapes():
                     for cv in shape.cv[:]:
                         cv.setPosition(cv.getPosition() * neg_z_matrix)

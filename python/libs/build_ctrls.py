@@ -18,7 +18,7 @@ def create_ctrl(jnt=None,
                 network=None,
                 attr=None,
                 tags=None,
-                axis=None,
+                axis='',
                 shape='Circle',
                 size=1.0,
                 name=None,
@@ -62,6 +62,14 @@ def create_ctrl(jnt=None,
         naming_utils.add_tags(ctrl, {'Network': network})
 
     naming_utils.add_tags(ctrl, {'Type': 'CTRL'})
+
+    # Shape Scale Attr
+    ctrl.addAttr('shapeSize', attributeType='float')
+    ctrl.shapeSize.set(size)
+
+    # Shape Axis
+    ctrl.addAttr('shapeAxis', dataType='string')
+    ctrl.shapeAxis.set(axis)
 
     if jnt:
         ctrl.rotateOrder.set(jnt.rotateOrder.get())

@@ -137,7 +137,7 @@ def build_ikfk_limb(jnts, net, fk_size=2.0, fk_shape='Circle', ik_size=1.0, ik_s
                                               'CTRL'])
         ctrl_tags = {'Utility': 'FK', 'Axis': 'XY'}  # todo: add support for alternate mirror axis
         if idx <= 3:
-            ctrl = build_ctrls.create_ctrl(jnt=fk_jnt, name=ctrl_name, network=net, attr=net.FK_CTRLS, tags=ctrl_tags, size=size, shape=fk_shape, axis='x')
+            ctrl = build_ctrls.create_ctrl(jnt=fk_jnt, name=ctrl_name, network=net, attr=net.FK_CTRLS, tags=ctrl_tags, size=size, shape=fk_shape, axis='X')
 
     for idx, fk in enumerate(net.fk_ctrls):
         if idx > 0:
@@ -198,7 +198,7 @@ def build_ikfk_limb(jnts, net, fk_size=2.0, fk_shape='Circle', ik_size=1.0, ik_s
     # Switch CTRL
     switch_name = naming_utils.concatenate([net.jnts[2].name_info.base_name, net.jnts[2].name_info.joint_name, 'IKFK', 'CTRL'])
     switch_tags = {'Type': 'Switch', 'Utility': 'IKFK'}
-    switch = build_ctrls.create_ctrl(jnt=net.jnts[2], name=switch_name, network=net, attr=net.SWITCH, tags=switch_tags, shape=ikfk_shape, size=ikfk_size, axis='x')
+    switch = build_ctrls.create_ctrl(jnt=net.jnts[2], name=switch_name, network=net, attr=net.SWITCH, tags=switch_tags, shape=ikfk_shape, size=ikfk_size, axis='X')
     switch_offset = joint_utils.create_offset_groups(switch)
     pymel.parentConstraint([jnts[2], switch_offset])
 
@@ -307,7 +307,7 @@ def build_spine(jnts, net, fk_size=2.0):
     # Chest CTRL
     chest_ctrl = make_ctrl(net.jnts[3], children=net.clusters[3:5], shape='Chest', size=1.0)
     # COG
-    cog = build_ctrls.create_ctrl(network=net, attr=net.COG, shape='Circle', size=5, name='COG', offset=False, axis='y')
+    cog = build_ctrls.create_ctrl(network=net, attr=net.COG, shape='Circle', size=5, name='COG', offset=False, axis='Y')
     cog.setTranslation(net.jnts[1].getTranslation(worldSpace=True))
 
     chest_ctrl.setParent(mid_ctrl)
@@ -414,9 +414,9 @@ def build_reverse_foot_rig(net):
 def build_clavicle(jnts, net):
 
     if net.side == 'L':
-        ctrl = build_ctrls.create_ctrl(jnt=jnts[0], network=net, attr=net.FK_CTRLS, shape='Clavicle', mirrored=True, axis='z')
+        ctrl = build_ctrls.create_ctrl(jnt=jnts[0], network=net, attr=net.FK_CTRLS, shape='Clavicle', mirrored=True, axis='Z')
     else:
-        ctrl = build_ctrls.create_ctrl(jnt=jnts[0], network=net, attr=net.FK_CTRLS, shape='Clavicle', axis = '-x')  # todo: '-x' is really unintuitive, look into this further.
+        ctrl = build_ctrls.create_ctrl(jnt=jnts[0], network=net, attr=net.FK_CTRLS, shape='Clavicle', axis='-X')  # todo: '-X' is really unintuitive, look into this further.
 
     offset = joint_utils.create_offset_groups(ctrl, net=net)
     naming_utils.add_tags(ctrl, {'Utility': 'FK', 'Axis': 'XY'})
@@ -456,7 +456,7 @@ def build_hand(jnts, net, ctrl_size=0.6):
 
         parent_name = naming_utils.concatenate([parent.side, parent.base_name, parent.joint_name, parent.info_index, 'CTRL'])
 
-        ctrl = build_ctrls.create_ctrl(jnt=jnt, network=net, size=ctrl_size, name=name, attr=net.FK_CTRLS, axis='x')
+        ctrl = build_ctrls.create_ctrl(jnt=jnt, network=net, size=ctrl_size, name=name, attr=net.FK_CTRLS, axis='X')
         ctrls.append(ctrl)
         pymel.parentConstraint([ctrl, jnt])
 
